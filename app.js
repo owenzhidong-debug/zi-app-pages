@@ -23,8 +23,19 @@ const bindSheet = document.getElementById("bindSheet");
 const boundDeviceList = document.getElementById("boundDeviceList");
 const simulateScanButton = document.getElementById("simulateScanButton");
 const fileManagerBack = document.getElementById("fileManagerBack");
+const loginForm = document.getElementById("loginForm");
+const registerForm = document.getElementById("registerForm");
+const loginEmail = document.getElementById("loginEmail");
+const registerName = document.getElementById("registerName");
+const registerEmail = document.getElementById("registerEmail");
+const profileName = document.getElementById("profileName");
+const profileEmail = document.getElementById("profileEmail");
 
 let toastTimer = null;
+const fallbackUser = {
+  name: "Darwin",
+  email: "darwin@example.com",
+};
 
 function showToast(message) {
   toast.textContent = message;
@@ -32,6 +43,77 @@ function showToast(message) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toast.classList.remove("show"), 1600);
 }
+
+function getSavedUser() {
+  try {
+    return JSON.parse(localStorage.getItem("zi-app-user")) || null;
+  } catch {
+    return null;
+  }
+}
+
+function setProfileUser(user) {
+  profileName.textContent = user.name || fallbackUser.name;
+  profileEmail.textContent = user.email || fallbackUser.email;
+}
+
+function unlockApp(user) {
+  const nextUser = user || fallbackUser;
+  localStorage.setItem("zi-app-user", JSON.stringify(nextUser));
+  setProfileUser(nextUser);
+  phone.classList.remove("auth-mode");
+  showToast("已登录");
+}
+
+function lockApp() {
+  localStorage.removeItem("zi-app-user");
+  phone.className = "phone auth-mode";
+  closeDeviceSheet();
+  deviceMenuButton.setAttribute("aria-expanded", "false");
+  deviceMenu.hidden = true;
+  document.querySelectorAll(".tab-item").forEach((item) => {
+    item.classList.toggle("active", item.dataset.tab === "首页");
+  });
+  showToast("已退出登录");
+}
+
+const savedUser = getSavedUser();
+if (savedUser) {
+  setProfileUser(savedUser);
+  phone.classList.remove("auth-mode");
+} else {
+  setProfileUser(fallbackUser);
+}
+
+document.querySelectorAll("[data-auth-tab]").forEach((tab) => {
+  tab.addEventListener("click", () => {
+    const target = tab.dataset.authTab;
+    document.querySelectorAll("[data-auth-tab]").forEach((item) => {
+      const active = item === tab;
+      item.classList.toggle("active", active);
+      item.setAttribute("aria-selected", String(active));
+    });
+    document.querySelectorAll("[data-auth-form]").forEach((form) => {
+      form.classList.toggle("active", form.dataset.authForm === target);
+    });
+  });
+});
+
+loginForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  unlockApp({
+    name: fallbackUser.name,
+    email: loginEmail.value.trim() || fallbackUser.email,
+  });
+});
+
+registerForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  unlockApp({
+    name: registerName.value.trim() || fallbackUser.name,
+    email: registerEmail.value.trim() || fallbackUser.email,
+  });
+});
 
 connectButton.addEventListener("click", () => {
   const connected = connectButton.classList.toggle("is-connected");
@@ -195,6 +277,10 @@ addDeviceButton.addEventListener("click", openBindSheet);
 
 document.querySelectorAll("[data-profile-action]").forEach((action) => {
   action.addEventListener("click", () => {
+    if (action.dataset.profileAction === "退出登录") {
+      lockApp();
+      return;
+    }
     if (action.dataset.profileAction === "文件管理") {
       phone.classList.add("file-manager-mode");
       phone.classList.remove("profile-mode", "bookstore-mode", "gallery-mode", "cover-editor-mode");

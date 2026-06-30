@@ -8,7 +8,60 @@
   </head>
   <body>
     <main class="stage" aria-label="App 首页效果图">
-      <section class="phone" aria-label="Darwin's Onyx epaper 首页原型">
+      <section class="phone auth-mode" aria-label="Darwin's Onyx epaper 首页原型">
+        <section class="auth-view" id="authView" aria-label="注册登录">
+          <div class="auth-hero" aria-hidden="true">
+            <span class="auth-device">
+              <span class="auth-screen">
+                <span></span>
+                <span></span>
+                <span></span>
+              </span>
+            </span>
+          </div>
+
+          <section class="auth-panel">
+            <div class="auth-title">
+              <span>ZI</span>
+              <h1>连接你的墨水屏</h1>
+              <p>登录后同步图书、壁纸和模板，并管理已绑定设备。</p>
+            </div>
+
+            <div class="auth-switch" role="tablist" aria-label="账号入口">
+              <button class="active" type="button" role="tab" aria-selected="true" data-auth-tab="login">登录</button>
+              <button type="button" role="tab" aria-selected="false" data-auth-tab="register">注册</button>
+            </div>
+
+            <form class="auth-form active" id="loginForm" data-auth-form="login">
+              <label>
+                <span>邮箱</span>
+                <input id="loginEmail" type="email" value="darwin@example.com" autocomplete="email" required />
+              </label>
+              <label>
+                <span>密码</span>
+                <input type="password" value="12345678" autocomplete="current-password" required />
+              </label>
+              <button class="auth-primary" type="submit">登录并进入</button>
+            </form>
+
+            <form class="auth-form" id="registerForm" data-auth-form="register">
+              <label>
+                <span>昵称</span>
+                <input id="registerName" type="text" value="Darwin" autocomplete="name" required />
+              </label>
+              <label>
+                <span>邮箱</span>
+                <input id="registerEmail" type="email" value="darwin@example.com" autocomplete="email" required />
+              </label>
+              <label>
+                <span>密码</span>
+                <input type="password" value="12345678" autocomplete="new-password" required />
+              </label>
+              <button class="auth-primary" type="submit">创建账号并进入</button>
+            </form>
+          </section>
+        </section>
+
         <div class="hero">
           <button class="device-preview" id="rotateDevice" type="button" aria-label="旋转设备预览">
             <span class="tablet">
@@ -346,8 +399,8 @@
               </svg>
             </span>
             <span class="profile-info">
-              <strong>Darwin</strong>
-              <span>darwin@example.com</span>
+              <strong id="profileName">Darwin</strong>
+              <span id="profileEmail">darwin@example.com</span>
             </span>
             <svg class="profile-chevron" viewBox="0 0 24 24" aria-hidden="true">
               <path d="m9 18 6-6-6-6" />
@@ -425,6 +478,17 @@
                 <path d="M12 18h.01" />
               </svg>
               <span>帮助与反馈</span>
+              <svg class="row-chevron" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m9 18 6-6-6-6" />
+              </svg>
+            </button>
+            <button class="logout-row" type="button" data-profile-action="退出登录">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M10 17l5-5-5-5" />
+                <path d="M15 12H3" />
+                <path d="M21 5v14" />
+              </svg>
+              <span>退出登录</span>
               <svg class="row-chevron" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="m9 18 6-6-6-6" />
               </svg>
