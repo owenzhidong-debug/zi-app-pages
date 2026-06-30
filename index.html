@@ -1,0 +1,625 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Darwin's Onyx epaper</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="stage" aria-label="App 首页效果图">
+      <section class="phone" aria-label="Darwin's Onyx epaper 首页原型">
+        <div class="hero">
+          <button class="device-preview" id="rotateDevice" type="button" aria-label="旋转设备预览">
+            <span class="tablet">
+              <span class="tablet-screen" aria-hidden="true">
+                <span class="ink-art">
+                  <span class="ink-stroke stroke-a"></span>
+                  <span class="ink-stroke stroke-b"></span>
+                  <span class="ink-stroke stroke-c"></span>
+                  <span class="ink-stroke stroke-d"></span>
+                  <span class="ink-scribble scribble-a"></span>
+                  <span class="ink-scribble scribble-b"></span>
+                </span>
+              </span>
+            </span>
+          </button>
+        </div>
+
+        <section class="home-panel" aria-label="首页操作">
+          <div class="device-row">
+            <button class="device-name" id="deviceMenuButton" type="button" aria-expanded="false">
+              <span>Darwin's Onyx epaper</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
+
+            <button class="connection-pill" id="connectButton" type="button" aria-pressed="false">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5 13a10 10 0 0 1 14 0" />
+                <path d="M8.5 16.5a5 5 0 0 1 7 0" />
+                <path d="M12 20h.01" />
+              </svg>
+              <span id="connectText">未连接</span>
+            </button>
+          </div>
+
+          <p class="last-sync" id="lastSync">上次连接：2 天前</p>
+
+          <div class="device-menu" id="deviceMenu" hidden>
+            <button type="button" data-device="Darwin's Onyx epaper">Darwin's Onyx epaper</button>
+            <button type="button" data-device="Boox Palma">Boox Palma</button>
+            <button type="button" data-device="Living room Note">Living room Note</button>
+          </div>
+
+          <div class="action-grid" aria-label="主要功能">
+            <button class="action-card" type="button" data-action="导入图书">
+              <span class="icon-circle">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M7 3h7l4 4v14H7z" />
+                  <path d="M14 3v5h5" />
+                  <path d="M10 12h5" />
+                  <path d="M10 16h7" />
+                </svg>
+              </span>
+              <span>导入图书</span>
+            </button>
+
+            <button class="action-card" type="button" data-action="导入壁纸">
+              <span class="icon-circle">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="4" y="4" width="16" height="16" rx="2" />
+                  <circle cx="9" cy="9" r="1.8" />
+                  <path d="m5 18 5.5-5.5L14 16l2-2 3 4" />
+                </svg>
+              </span>
+              <span>导入壁纸</span>
+            </button>
+
+            <button class="action-card" type="button" data-action="网页链接">
+              <span class="icon-circle">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M10 13a5 5 0 0 0 7.1 0l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1" />
+                  <path d="M14 11a5 5 0 0 0-7.1 0l-2 2A5 5 0 0 0 12 20.1l1.1-1.1" />
+                </svg>
+              </span>
+              <span>网页链接</span>
+            </button>
+
+            <button class="action-card" type="button" data-action="导入字体">
+              <span class="icon-circle">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M5 5h14" />
+                  <path d="M12 5v14" />
+                  <path d="M8 19h8" />
+                </svg>
+              </span>
+              <span>导入字体</span>
+            </button>
+          </div>
+
+          <p class="status-line" id="statusLine">选择一个入口开始同步内容。</p>
+        </section>
+
+        <section class="bookstore-view" id="bookstoreView" aria-label="书城">
+          <label class="search-box">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="11" cy="11" r="7" />
+              <path d="m16 16 4 4" />
+            </svg>
+            <input id="bookSearch" type="search" placeholder="搜索书名、作者或主题" autocomplete="off" />
+          </label>
+
+          <div class="category-row" aria-label="书城分类">
+            <button class="category-chip active" type="button">精选</button>
+            <button class="category-chip" type="button">文学</button>
+            <button class="category-chip" type="button">产品</button>
+            <button class="category-chip" type="button">历史</button>
+            <button class="category-chip" type="button">科幻</button>
+          </div>
+
+          <button class="featured-book" type="button" data-book="纸上城市">
+            <span class="featured-copy">
+              <span class="featured-label">本周主推</span>
+              <strong>纸上城市</strong>
+              <span>适合墨水屏阅读的城市随笔，已优化封面与排版。</span>
+            </span>
+            <span class="featured-cover cover-city" aria-hidden="true"></span>
+          </button>
+
+          <section class="store-section" aria-label="继续阅读">
+            <div class="section-head">
+              <h2>继续阅读</h2>
+              <button type="button" class="text-button">全部</button>
+            </div>
+            <div class="book-rail">
+              <button class="book-card" type="button" data-book="长日将尽">
+                <span class="book-cover cover-sun"></span>
+                <strong>长日将尽</strong>
+                <span>已读 42%</span>
+              </button>
+              <button class="book-card" type="button" data-book="设计心理学">
+                <span class="book-cover cover-grid"></span>
+                <strong>设计心理学</strong>
+                <span>已读 18%</span>
+              </button>
+              <button class="book-card" type="button" data-book="乡土中国">
+                <span class="book-cover cover-plain"></span>
+                <strong>乡土中国</strong>
+                <span>已读 7%</span>
+              </button>
+            </div>
+          </section>
+
+          <section class="store-section compact" aria-label="今日推荐">
+            <div class="section-head">
+              <h2>今日推荐</h2>
+              <button type="button" class="text-button">换一批</button>
+            </div>
+            <div class="recommend-list">
+              <button class="recommend-row" type="button" data-book="为什么读经典">
+                <span class="mini-cover cover-classic"></span>
+                <span>
+                  <strong>为什么读经典</strong>
+                  <small>文学 · 45 分钟 · 适合通勤</small>
+                </span>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
+              </button>
+              <button class="recommend-row" type="button" data-book="产品沉思录">
+                <span class="mini-cover cover-product"></span>
+                <span>
+                  <strong>产品沉思录</strong>
+                  <small>商业 · 新上架 · 高亮版</small>
+                </span>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
+              </button>
+              <button class="recommend-row" type="button" data-book="月球图书馆">
+                <span class="mini-cover cover-moon"></span>
+                <span>
+                  <strong>月球图书馆</strong>
+                  <small>科幻 · 评分 4.8 · 限免</small>
+                </span>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
+              </button>
+            </div>
+            <p class="store-empty" id="storeEmpty" hidden>暂时没有匹配结果，可以试试“文学”或“产品”。</p>
+          </section>
+        </section>
+
+        <section class="gallery-view" id="galleryView" aria-label="图库">
+          <div class="gallery-tabs" role="tablist" aria-label="图库分类">
+            <button class="gallery-tab active" type="button" role="tab" aria-selected="true" data-gallery-tab="resources">资源</button>
+            <button class="gallery-tab" type="button" role="tab" aria-selected="false" data-gallery-tab="templates">模板</button>
+          </div>
+
+          <section class="gallery-panel active" id="resourcesPanel" aria-label="官方图片资源">
+            <div class="masonry-grid">
+              <button class="asset-tile tall" type="button" data-asset="宣纸书法背景">
+                <img src="./calligraphy_base_480x800.png" alt="宣纸书法背景缩略图" />
+                <span>宣纸书法背景</span>
+              </button>
+              <button class="asset-tile" type="button" data-asset="羊皮纸纹理">
+                <img src="./calligraphy_parchment_480x800.png" alt="羊皮纸纹理缩略图" />
+                <span>羊皮纸纹理</span>
+              </button>
+              <button class="asset-tile wide" type="button" data-asset="横版墨水屏壁纸">
+                <img src="./gongka_background_screen_800x480.png" alt="横版墨水屏壁纸缩略图" />
+                <span>横版墨水屏壁纸</span>
+              </button>
+              <button class="asset-tile" type="button" data-asset="工作证底图">
+                <img src="./work_badge_base_480x800.png" alt="工作证底图缩略图" />
+                <span>工作证底图</span>
+              </button>
+              <button class="asset-tile" type="button" data-asset="竖版公卡背景">
+                <img src="./gongka_background_480x800.png" alt="竖版公卡背景缩略图" />
+                <span>竖版公卡背景</span>
+              </button>
+              <button class="asset-tile" type="button" data-asset="盾牌证件底图">
+                <img src="./work_badge_shield_480x800.png" alt="盾牌证件底图缩略图" />
+                <span>盾牌证件底图</span>
+              </button>
+            </div>
+          </section>
+
+          <section class="gallery-panel" id="templatesPanel" aria-label="图库模板">
+            <div class="template-masonry">
+              <button class="template-tile template-cover" type="button" data-template="透明书封">
+                <span class="template-preview" aria-hidden="true">
+                  <span class="preview-page">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </span>
+                  <span class="preview-cover"></span>
+                </span>
+                <span class="template-copy-block">
+                  <strong>透明书封</strong>
+                </span>
+              </button>
+
+              <button class="template-tile template-badge" type="button" data-template="工卡模板">
+                <span class="badge-preview" aria-hidden="true">
+                  <span class="badge-strip"></span>
+                  <span class="badge-photo"></span>
+                  <span class="badge-line"></span>
+                  <span class="badge-line short"></span>
+                </span>
+                <span class="template-copy-block">
+                  <strong>工卡模板</strong>
+                </span>
+              </button>
+
+              <button class="template-tile template-calligraphy" type="button" data-template="书法模板">
+                <span class="calligraphy-preview" aria-hidden="true">
+                  <span>小</span>
+                  <span>满</span>
+                  <span>胜</span>
+                  <span>万</span>
+                  <span>全</span>
+                </span>
+                <span class="template-copy-block">
+                  <strong>书法模板</strong>
+                </span>
+              </button>
+            </div>
+          </section>
+        </section>
+
+        <section class="cover-editor-view" id="coverEditorView" aria-label="透明书封编辑">
+          <header class="editor-header">
+            <button class="editor-back" type="button" id="coverBackButton" aria-label="返回图库">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m15 18-6-6 6-6" />
+              </svg>
+            </button>
+            <h1>透明书封</h1>
+            <button class="editor-reset" type="button">重置</button>
+          </header>
+
+          <div class="cover-editor-scroll">
+            <section class="cover-preview-card" aria-label="透明书封预览">
+              <div class="reader-device">
+                <div class="reader-page">
+                  <h2>《透明书封预览》</h2>
+                  <p>清晨的海面还没有完全亮起来，远处的船影压在纸页边缘。</p>
+                  <p>封面应该像一层很轻的墨色，只留下气氛，不挡住阅读。</p>
+                  <p>调整位置、透明度和黑白层次，直到文字仍然清楚。</p>
+                  <p>导出的 PNG 只保留书封图层，可直接推送到设备。</p>
+                  <span class="reader-progress"></span>
+                  <span class="reader-time">20:06</span>
+                  <span class="reader-battery">42%</span>
+                  <div class="cover-overlay" aria-hidden="true"></div>
+                </div>
+              </div>
+            </section>
+
+            <button class="import-image-button" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="4" y="4" width="16" height="16" rx="2" />
+                <circle cx="9" cy="9" r="1.8" />
+                <path d="m5 18 5.5-5.5L14 16l2-2 3 4" />
+              </svg>
+              <span>导入图片</span>
+            </button>
+
+            <div class="editor-tool-tabs" role="tablist" aria-label="编辑工具">
+              <button class="active" type="button">移动</button>
+              <button type="button">抠除</button>
+              <button type="button">参数</button>
+            </div>
+
+            <section class="editor-control-card" aria-label="移动设置">
+              <div class="control-line">
+                <span>缩放</span>
+                <strong id="coverZoomValue">100%</strong>
+              </div>
+              <input id="coverZoom" type="range" min="60" max="160" value="100" />
+              <div class="fit-actions">
+                <button type="button">适应</button>
+                <button type="button">铺满</button>
+                <button type="button">原始</button>
+              </div>
+              <p>在预览屏上调整书封位置，保持文字清晰可读。</p>
+            </section>
+          </div>
+
+          <footer class="editor-action-bar">
+            <button class="export-action" type="button">导出 PNG</button>
+            <button class="push-action" type="button">推送到设备</button>
+          </footer>
+        </section>
+
+        <section class="profile-view" id="profileView" aria-label="个人中心">
+          <button class="profile-card" type="button" aria-label="账户资料">
+            <span class="profile-avatar">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="8" r="4" />
+                <path d="M4 21a8 8 0 0 1 16 0" />
+              </svg>
+            </span>
+            <span class="profile-info">
+              <strong>Darwin</strong>
+              <span>darwin@example.com</span>
+            </span>
+            <svg class="profile-chevron" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m9 18 6-6-6-6" />
+            </svg>
+          </button>
+
+          <section class="profile-section" aria-label="已绑定设备">
+            <div class="profile-section-head">
+              <h2>已绑定设备</h2>
+              <button type="button" id="addDeviceButton" aria-label="添加设备">+</button>
+            </div>
+            <div class="bound-device-list" id="boundDeviceList">
+              <button class="device-list-row active-device" type="button" data-profile-device="Darwin's Onyx epaper">
+                <span>Darwin's Onyx epaper</span>
+                <svg class="device-check" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="m5 12 4 4 10-10" />
+                </svg>
+                <span class="device-more" aria-hidden="true">•••</span>
+              </button>
+              <button class="device-list-row" type="button" data-profile-device="Kindle Paperwhite">
+                <span>Kindle Paperwhite</span>
+                <span class="device-spacer"></span>
+                <span class="device-more" aria-hidden="true">•••</span>
+              </button>
+            </div>
+          </section>
+
+          <section class="profile-section action-list" aria-label="个人中心功能">
+            <button type="button" data-profile-action="文件传输列表">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 3h7l4 4v14H7z" />
+                <path d="M14 3v5h5" />
+                <path d="M10 13h5" />
+                <path d="M10 17h7" />
+              </svg>
+              <span>文件传输列表</span>
+              <svg class="row-chevron" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m9 18 6-6-6-6" />
+              </svg>
+            </button>
+            <button type="button" data-profile-action="文件管理">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 7h7l2 2h9v10H3z" />
+              </svg>
+              <span>文件管理</span>
+              <svg class="row-chevron" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m9 18 6-6-6-6" />
+              </svg>
+            </button>
+            <button type="button" data-profile-action="待办应用">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="4" y="5" width="16" height="15" rx="2" />
+                <path d="m8 12 2.5 2.5L16 9" />
+              </svg>
+              <span>待办应用</span>
+              <svg class="row-chevron" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m9 18 6-6-6-6" />
+              </svg>
+            </button>
+            <button type="button" data-profile-action="倒数日应用">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="13" r="8" />
+                <path d="M12 9v5l3 2" />
+                <path d="M9 2h6" />
+              </svg>
+              <span>倒数日应用</span>
+              <svg class="row-chevron" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m9 18 6-6-6-6" />
+              </svg>
+            </button>
+            <button type="button" data-profile-action="帮助与反馈">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M9.5 9a2.7 2.7 0 0 1 5 1.3c0 2-2.5 2-2.5 4" />
+                <path d="M12 18h.01" />
+              </svg>
+              <span>帮助与反馈</span>
+              <svg class="row-chevron" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m9 18 6-6-6-6" />
+              </svg>
+            </button>
+          </section>
+        </section>
+
+        <section class="file-manager-view" id="fileManagerView" aria-label="文件管理">
+          <header class="manager-header">
+            <button class="manager-back" type="button" id="fileManagerBack" aria-label="返回个人中心">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m15 18-6-6 6-6" />
+              </svg>
+            </button>
+            <div>
+              <h1>文件管理</h1>
+              <span>Darwin's Onyx epaper</span>
+            </div>
+          </header>
+
+          <nav class="path-bar" aria-label="当前路径">
+            <button type="button" data-path="root">根目录</button>
+            <span>/</span>
+            <button type="button" data-path="books">Books</button>
+          </nav>
+
+          <section class="file-list-card" aria-label="设备文件">
+            <button class="file-row folder-row" type="button" data-folder="Books/Notes">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 7h7l2 2h9v10H3z" />
+              </svg>
+              <span>
+                <strong>Notes</strong>
+                <small>/Books/Notes</small>
+              </span>
+              <svg class="row-chevron" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m9 18 6-6-6-6" />
+              </svg>
+            </button>
+
+            <div class="file-row" data-file-name="透明书封预览.png">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="4" y="4" width="16" height="16" rx="2" />
+                <circle cx="9" cy="9" r="1.8" />
+                <path d="m5 18 5.5-5.5L14 16l2-2 3 4" />
+              </svg>
+              <span>
+                <strong>透明书封预览.png</strong>
+                <small>/Books/透明书封预览.png</small>
+              </span>
+              <button class="file-delete-button" type="button" aria-label="删除透明书封预览.png">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 7h16" />
+                  <path d="M10 11v6" />
+                  <path d="M14 11v6" />
+                  <path d="M6 7l1 14h10l1-14" />
+                  <path d="M9 7V4h6v3" />
+                </svg>
+              </button>
+            </div>
+
+            <div class="file-row" data-file-name="长日将尽.epub">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M6 4h12v16H6z" />
+                <path d="M9 8h6" />
+                <path d="M9 12h6" />
+              </svg>
+              <span>
+                <strong>长日将尽.epub</strong>
+                <small>/Books/长日将尽.epub</small>
+              </span>
+              <button class="file-delete-button" type="button" aria-label="删除长日将尽.epub">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 7h16" />
+                  <path d="M10 11v6" />
+                  <path d="M14 11v6" />
+                  <path d="M6 7l1 14h10l1-14" />
+                  <path d="M9 7V4h6v3" />
+                </svg>
+              </button>
+            </div>
+
+            <div class="file-row" data-file-name="阅读摘录.txt">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 3h7l4 4v14H7z" />
+                <path d="M14 3v5h5" />
+                <path d="M10 13h5" />
+                <path d="M10 17h7" />
+              </svg>
+              <span>
+                <strong>阅读摘录.txt</strong>
+                <small>/Books/阅读摘录.txt</small>
+              </span>
+              <button class="file-delete-button" type="button" aria-label="删除阅读摘录.txt">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 7h16" />
+                  <path d="M10 11v6" />
+                  <path d="M14 11v6" />
+                  <path d="M6 7l1 14h10l1-14" />
+                  <path d="M9 7V4h6v3" />
+                </svg>
+              </button>
+            </div>
+          </section>
+        </section>
+
+        <div class="sheet-scrim" id="sheetScrim" hidden></div>
+        <section class="device-sheet" id="deviceSheet" aria-label="设备操作" hidden>
+          <div class="sheet-handle"></div>
+          <h2 id="sheetDeviceName">Darwin's Onyx epaper</h2>
+          <button type="button" data-sheet-action="rename">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 20h9" />
+              <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" />
+            </svg>
+            <span>修改名称</span>
+          </button>
+          <button class="danger" type="button" data-sheet-action="unbind">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M10 13a5 5 0 0 0 7.1 0l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1" />
+              <path d="M14 11a5 5 0 0 0-7.1 0l-2 2A5 5 0 0 0 12 20.1l1.1-1.1" />
+            </svg>
+            <span>解绑设备</span>
+          </button>
+        </section>
+
+        <section class="bind-sheet" id="bindSheet" aria-label="绑定新设备" hidden>
+          <div class="sheet-handle"></div>
+          <h2>扫码绑定设备</h2>
+          <p>请在墨水屏设备上打开绑定二维码，并将二维码放入取景框。</p>
+          <div class="scan-frame" aria-label="扫码取景框">
+            <span class="scan-corner top-left"></span>
+            <span class="scan-corner top-right"></span>
+            <span class="scan-corner bottom-left"></span>
+            <span class="scan-corner bottom-right"></span>
+            <span class="scan-line"></span>
+            <span class="qr-guide" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </span>
+          </div>
+          <button class="scan-bind-button" type="button" id="simulateScanButton">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 7V5a1 1 0 0 1 1-1h2" />
+              <path d="M17 4h2a1 1 0 0 1 1 1v2" />
+              <path d="M20 17v2a1 1 0 0 1-1 1h-2" />
+              <path d="M7 20H5a1 1 0 0 1-1-1v-2" />
+              <path d="M7 12h10" />
+            </svg>
+            <span>模拟扫描二维码</span>
+          </button>
+        </section>
+
+        <nav class="tabbar" aria-label="底部导航">
+          <button class="tab-item active" type="button" data-tab="首页">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m3 11 9-8 9 8" />
+              <path d="M5 10v10h14V10" />
+              <path d="M9 20v-6h6v6" />
+            </svg>
+            <span>首页</span>
+          </button>
+          <button class="tab-item" type="button" data-tab="书城">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 8h14v12H5z" />
+              <path d="m8 8 1.5-4h5L16 8" />
+              <path d="M9 12a3 3 0 0 0 6 0" />
+            </svg>
+            <span>书城</span>
+          </button>
+          <button class="tab-item" type="button" data-tab="图库">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="6" y="4" width="14" height="14" rx="2" />
+              <path d="M4 8v12h12" />
+              <circle cx="11" cy="9" r="1.7" />
+              <path d="m8 16 3-3 2 2 2-2 3 3" />
+            </svg>
+            <span>图库</span>
+          </button>
+          <button class="tab-item" type="button" data-tab="个人中心">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="8" r="4" />
+              <path d="M4 21a8 8 0 0 1 16 0" />
+            </svg>
+            <span>个人中心</span>
+          </button>
+        </nav>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
