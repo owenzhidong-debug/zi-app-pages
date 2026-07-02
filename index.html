@@ -102,6 +102,22 @@
 
           <p class="last-sync" id="lastSync">上次连接：2 天前</p>
 
+          <button class="transfer-summary-card" id="transferSummaryCard" type="button" hidden>
+            <span class="transfer-summary-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M7 3h7l4 4v14H7z" />
+                <path d="M14 3v5h5" />
+                <path d="M10 13h7" />
+                <path d="m14 9 4 4-4 4" />
+              </svg>
+            </span>
+            <span class="transfer-summary-copy">
+              <strong id="transferSummaryTitle">0 个文件传输中</strong>
+              <small id="transferSummaryMeta">点击查看具体进度</small>
+            </span>
+            <span class="transfer-summary-percent" id="transferSummaryPercent">0%</span>
+          </button>
+
           <div class="device-menu" id="deviceMenu" hidden>
             <button type="button" data-device="Darwin's Onyx epaper">Darwin's Onyx epaper</button>
             <button type="button" data-device="Boox Palma">Boox Palma</button>
@@ -154,15 +170,7 @@
             </button>
           </div>
 
-          <input class="book-file-input" id="bookFileInput" type="file" accept=".epub,.txt,application/epub+zip,text/plain" hidden />
-
-          <section class="recent-transfer" id="recentTransfer" aria-label="最近传输" hidden>
-            <div class="recent-transfer-head">
-              <h2>最近传输</h2>
-              <button type="button" id="viewAllTransferButton">查看全部</button>
-            </div>
-            <div class="recent-transfer-list" id="recentTransferList"></div>
-          </section>
+          <input class="book-file-input" id="bookFileInput" type="file" accept=".epub,.txt,application/epub+zip,text/plain" multiple hidden />
         </section>
 
         <section class="bookstore-view" id="bookstoreView" aria-label="书城">
@@ -1126,6 +1134,17 @@
               </svg>
             </button>
           </div>
+        </section>
+
+        <section class="transfer-detail-sheet" id="transferDetailSheet" aria-label="传输进度" hidden>
+          <button class="transfer-detail-close" type="button" id="transferDetailCloseButton" aria-label="关闭传输进度">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m6 6 12 12" />
+              <path d="m18 6-12 12" />
+            </svg>
+          </button>
+          <h2>传输进度</h2>
+          <div class="transfer-detail-list" id="transferDetailList"></div>
         </section>
 
         <section class="connection-sheet" id="connectionSheet" aria-label="连接设备" hidden>

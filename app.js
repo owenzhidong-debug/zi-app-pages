@@ -9,9 +9,13 @@ const homeScanBindButton = document.getElementById("homeScanBindButton");
 const homeDeviceRow = document.getElementById("homeDeviceRow");
 const homeActionGrid = document.getElementById("homeActionGrid");
 const bookFileInput = document.getElementById("bookFileInput");
-const recentTransfer = document.getElementById("recentTransfer");
-const recentTransferList = document.getElementById("recentTransferList");
-const viewAllTransferButton = document.getElementById("viewAllTransferButton");
+const transferSummaryCard = document.getElementById("transferSummaryCard");
+const transferSummaryTitle = document.getElementById("transferSummaryTitle");
+const transferSummaryMeta = document.getElementById("transferSummaryMeta");
+const transferSummaryPercent = document.getElementById("transferSummaryPercent");
+const transferDetailSheet = document.getElementById("transferDetailSheet");
+const transferDetailCloseButton = document.getElementById("transferDetailCloseButton");
+const transferDetailList = document.getElementById("transferDetailList");
 const deviceMenuButton = document.getElementById("deviceMenuButton");
 const deviceMenu = document.getElementById("deviceMenu");
 const phone = document.querySelector(".phone");
@@ -107,6 +111,7 @@ let toastTimer = null;
 let connectionTimer = null;
 let editingTodoCard = null;
 let editingCountdownCard = null;
+const transferTasks = [];
 const sceneState = {
   phoneWifiConnected: false,
   einkWifiConnected: false,
@@ -250,51 +255,70 @@ function getTransferTimeLabel() {
   return `今天 ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
 }
 
-function createTransferRow(file) {
-  const row = document.createElement("article");
-  row.className = "transfer-row";
-  row.dataset.progress = "0";
-  row.innerHTML = `
-    <span class="transfer-file-icon" aria-hidden="true">
-      <svg viewBox="0 0 24 24">
-        <path d="M7 3h7l4 4v14H7z" />
-        <path d="M14 3v5h5" />
-        <path d="M10 12h5" />
-        <path d="M10 16h7" />
-      </svg>
-    </span>
-    <span class="transfer-info">
-      <strong>${escapeHTML(file.name)}</strong>
-      <small><span class="transfer-status">传输中</span> · ${getTransferTimeLabel()} · ${formatFileSize(file.size)}</small>
-    </span>
-    <span class="transfer-side">
-      <span class="transfer-chip">局域网</span>
-      <span class="transfer-progress">0%</span>
-    </span>
-  `;
-  recentTransferList.prepend(row);
-  [...recentTransferList.children].slice(3).forEach((item) => item.remove());
-  recentTransfer.hidden = false;
-  return row;
+function renderTransferDetailList() {
+  transferDetailList.innerHTML = transferTasks.map((task) => `
+    <article class="transfer-row${task.progress >= 100 ? " is-complete" : ""}">
+      <span class="transfer-file-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M7 3h7l4 4v14H7z" />
+          <path d="M14 3v5h5" />
+          <path d="M10 12h5" />
+          <path d="M10 16h7" />
+        </svg>
+      </span>
+      <span class="transfer-info">
+        <strong>${escapeHTML(task.name)}</strong>
+        <small><span class="transfer-status">${task.progress >= 100 ? "已完成" : "传输中"}</span> · ${task.timeLabel} · ${task.sizeLabel}</small>
+      </span>
+      <span class="transfer-side">
+        <span class="transfer-chip">局域网</span>
+        <span class="transfer-progress">${task.progress >= 100 ? "完成" : `${task.progress}%`}</span>
+      </span>
+    </article>
+  `).join("");
 }
 
-function updateTransferRow(row, progress) {
-  const nextProgress = Math.min(100, progress);
-  row.dataset.progress = String(nextProgress);
-  row.querySelector(".transfer-progress").textContent = nextProgress >= 100 ? "完成" : `${nextProgress}%`;
-  if (nextProgress >= 100) {
-    row.classList.add("is-complete");
-    row.querySelector(".transfer-status").textContent = "已完成";
-  }
+function updateTransferSummary() {
+  const activeTasks = transferTasks.filter((task) => task.progress < 100);
+  transferSummaryCard.hidden = activeTasks.length === 0;
+  if (!activeTasks.length) return;
+
+  const averageProgress = Math.round(activeTasks.reduce((sum, task) => sum + task.progress, 0) / activeTasks.length);
+  transferSummaryTitle.textContent = `${activeTasks.length} 个文件传输中`;
+  transferSummaryMeta.textContent = activeTasks.length === 1 ? activeTasks[0].name : "点击查看具体进度";
+  transferSummaryPercent.textContent = `${averageProgress}%`;
+}
+
+function renderTransferViews() {
+  updateTransferSummary();
+  renderTransferDetailList();
+}
+
+function createTransferTask(file) {
+  const task = {
+    id: Date.now() + Math.random(),
+    name: file.name,
+    sizeLabel: formatFileSize(file.size),
+    timeLabel: getTransferTimeLabel(),
+    progress: 0,
+  };
+  transferTasks.unshift(task);
+  transferTasks.splice(8);
+  renderTransferViews();
+  return task;
+}
+
+function updateTransferTask(task, progress) {
+  task.progress = Math.min(100, progress);
+  renderTransferViews();
 }
 
 function startBookTransfer(file) {
-  const row = createTransferRow(file);
+  const task = createTransferTask(file);
   let progress = 0;
-  showToast("开始传输图书");
   const timer = setInterval(() => {
     progress += Math.floor(Math.random() * 14) + 10;
-    updateTransferRow(row, progress);
+    updateTransferTask(task, progress);
     if (progress >= 100) {
       clearInterval(timer);
       showToast("图书已导入墨水屏");
@@ -497,6 +521,7 @@ function openDeviceSheet(deviceName) {
   bindSheet.hidden = true;
   connectionSheet.hidden = true;
   importTransferSheet.hidden = true;
+  transferDetailSheet.hidden = true;
   phone.classList.remove("scan-bind-mode");
   sheetDeviceName.textContent = deviceName;
   sheetScrim.hidden = false;
@@ -507,6 +532,7 @@ function openBindSheet() {
   deviceSheet.hidden = true;
   connectionSheet.hidden = true;
   importTransferSheet.hidden = true;
+  transferDetailSheet.hidden = true;
   sheetScrim.hidden = true;
   bindSheet.hidden = false;
   phone.classList.add("scan-bind-mode");
@@ -546,6 +572,7 @@ function openConnectionSheet() {
   bindSheet.hidden = true;
   deviceSheet.hidden = true;
   importTransferSheet.hidden = true;
+  transferDetailSheet.hidden = true;
   connectionDeviceTitle.textContent = activeProfileDevice;
   connectionSuccessDevice.textContent = activeProfileDevice;
   connectionSheet.classList.remove("is-connecting", "is-success");
@@ -572,6 +599,7 @@ function openImportTransferSheet() {
   bindSheet.hidden = true;
   deviceSheet.hidden = true;
   connectionSheet.hidden = true;
+  transferDetailSheet.hidden = true;
   connectionSheet.classList.remove("is-connecting", "is-success");
   importTransferSheet.hidden = false;
   sheetScrim.hidden = false;
@@ -580,6 +608,24 @@ function openImportTransferSheet() {
 
 function closeImportTransferSheet() {
   importTransferSheet.hidden = true;
+  sheetScrim.hidden = true;
+}
+
+function openTransferDetailSheet() {
+  if (!transferTasks.length) return;
+  clearTimeout(connectionTimer);
+  bindSheet.hidden = true;
+  deviceSheet.hidden = true;
+  connectionSheet.hidden = true;
+  importTransferSheet.hidden = true;
+  transferDetailSheet.hidden = false;
+  sheetScrim.hidden = false;
+  phone.classList.remove("scan-bind-mode");
+  renderTransferDetailList();
+}
+
+function closeTransferDetailSheet() {
+  transferDetailSheet.hidden = true;
   sheetScrim.hidden = true;
 }
 
@@ -768,6 +814,7 @@ function closeDeviceSheet() {
   connectionSheet.hidden = true;
   connectionSheet.classList.remove("is-connecting", "is-success");
   importTransferSheet.hidden = true;
+  transferDetailSheet.hidden = true;
   bindSheet.hidden = true;
   phone.classList.remove("scan-bind-mode");
   syncDeviceState();
@@ -821,7 +868,7 @@ function syncDeviceState(preferredDevice = activeProfileDevice) {
     homeBindEmpty.hidden = false;
     homeDeviceRow.hidden = true;
     homeActionGrid.hidden = true;
-    recentTransfer.hidden = true;
+    transferSummaryCard.hidden = true;
     lastSync.hidden = true;
     deviceMenuButton.querySelector("span").textContent = "绑定设备";
     deviceMenuButton.setAttribute("aria-expanded", "false");
@@ -838,7 +885,7 @@ function syncDeviceState(preferredDevice = activeProfileDevice) {
   homeBindEmpty.hidden = true;
   homeDeviceRow.hidden = false;
   homeActionGrid.hidden = false;
-  recentTransfer.hidden = recentTransferList.children.length === 0;
+  updateTransferSummary();
   lastSync.hidden = false;
   const deviceNames = rows.map((row) => row.dataset.profileDevice);
   const nextDevice = deviceNames.includes(preferredDevice) ? preferredDevice : deviceNames[0];
@@ -1339,17 +1386,20 @@ importCloudTransferButton.addEventListener("click", () => {
   showToast("已选择云端传输");
 });
 bookFileInput.addEventListener("change", () => {
-  const file = bookFileInput.files?.[0];
-  if (!file) return;
-  if (!isSupportedBookFile(file)) {
+  const files = [...(bookFileInput.files || [])];
+  if (!files.length) return;
+  const unsupported = files.find((file) => !isSupportedBookFile(file));
+  if (unsupported) {
     showToast("仅支持 epub 或 txt 文件");
     bookFileInput.value = "";
     return;
   }
-  startBookTransfer(file);
+  showToast(files.length > 1 ? `开始传输 ${files.length} 个文件` : "开始传输图书");
+  files.forEach(startBookTransfer);
   bookFileInput.value = "";
 });
-viewAllTransferButton.addEventListener("click", () => showToast("查看全部传输"));
+transferSummaryCard.addEventListener("click", openTransferDetailSheet);
+transferDetailCloseButton.addEventListener("click", closeTransferDetailSheet);
 scenePhoneWifiButton.addEventListener("click", () => {
   setSceneCondition("phoneWifiConnected", !sceneState.phoneWifiConnected);
   showToast(sceneState.phoneWifiConnected ? "手机已连接 WiFi" : "手机已断开 WiFi");

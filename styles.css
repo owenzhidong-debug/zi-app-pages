@@ -830,42 +830,120 @@ svg {
   stroke-width: 1.9;
 }
 
-.recent-transfer {
-  margin-top: 24px;
-  padding: 18px;
-  border: 1px solid var(--line);
-  border-radius: 22px;
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.88);
-}
-
-.recent-transfer-head {
-  display: flex;
+.transfer-summary-card {
+  width: 100%;
+  min-height: 72px;
+  margin: 0 0 18px;
+  padding: 13px 15px;
+  display: grid;
+  grid-template-columns: 42px 1fr auto;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
+  border: 1px solid #dce7df;
+  border-radius: 18px;
+  background: #f6fbf7;
+  color: #151515;
+  text-align: left;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
-.recent-transfer-head h2 {
+.transfer-summary-icon {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #16a34a;
+  box-shadow: 0 8px 16px rgba(18, 24, 32, 0.07);
+}
+
+.transfer-summary-icon svg {
+  width: 23px;
+  height: 23px;
+  stroke-width: 2.1;
+}
+
+.transfer-summary-copy {
+  min-width: 0;
+}
+
+.transfer-summary-copy strong {
+  display: block;
+  color: #171717;
+  font-size: 17px;
+  line-height: 1.2;
+  font-weight: 880;
+  letter-spacing: -0.02em;
+}
+
+.transfer-summary-copy small {
+  display: block;
+  margin-top: 5px;
+  overflow: hidden;
+  color: #7f868f;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  line-height: 1.2;
+  font-weight: 650;
+}
+
+.transfer-summary-percent {
+  color: #16a34a;
+  font-size: 17px;
+  line-height: 1;
+  font-weight: 900;
+}
+
+.transfer-detail-sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 21;
+  min-height: 380px;
+  max-height: 560px;
+  padding: 46px 24px 38px;
+  overflow-y: auto;
+  border-radius: 30px 30px 0 0;
+  background: #ffffff;
+  box-shadow: 0 -24px 54px rgba(0, 0, 0, 0.16);
+}
+
+.transfer-detail-close {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #f0f1f3;
+  color: #6f7680;
+}
+
+.transfer-detail-close svg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 2.6;
+}
+
+.transfer-detail-sheet h2 {
   margin: 0;
   color: #151515;
-  font-size: 19px;
-  line-height: 1.2;
-  font-weight: 900;
-  letter-spacing: -0.03em;
+  text-align: center;
+  font-size: 28px;
+  line-height: 1.12;
+  font-weight: 920;
+  letter-spacing: -0.04em;
 }
 
-.recent-transfer-head button {
-  color: #2f7cf6;
-  font-size: 15px;
-  line-height: 1.2;
-  font-weight: 720;
-}
-
-.recent-transfer-list {
-  margin-top: 16px;
+.transfer-detail-list {
+  margin-top: 34px;
   display: grid;
-  gap: 14px;
+  gap: 18px;
 }
 
 .transfer-row {
