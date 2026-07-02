@@ -45,6 +45,7 @@ const profileName = document.getElementById("profileName");
 const profileEmail = document.getElementById("profileEmail");
 const sceneConditionGroup = document.getElementById("sceneConditionGroup");
 const scenePhoneWifiButton = document.getElementById("scenePhoneWifiButton");
+const sceneSwitchWifiButton = document.getElementById("sceneSwitchWifiButton");
 const sceneWifiButton = document.getElementById("sceneWifiButton");
 const sceneSameWifiButton = document.getElementById("sceneSameWifiButton");
 const sceneTransferButton = document.getElementById("sceneTransferButton");
@@ -545,6 +546,26 @@ function setSceneCondition(key, value) {
   }
   maybeStartSceneDevice();
   return false;
+}
+
+function disconnectDevice(message = "设备已断开") {
+  clearTimeout(connectionTimer);
+  closeConnectionSheet();
+  setDeviceConnection(false);
+  showToast(message);
+}
+
+function switchPhoneWifi() {
+  const shouldDisconnect = connectButton.classList.contains("is-connected") || connectionSheet.classList.contains("is-connecting");
+  sceneState.phoneWifiConnected = true;
+  sceneState.appSameWifi = false;
+  updateSceneConditionButtons(shouldDisconnect ? ["sameWifi"] : []);
+  updateConnectionCheckPanel();
+  if (shouldDisconnect) {
+    disconnectDevice("WiFi 已变化，请重新连接");
+    return;
+  }
+  showToast("手机已切换 WiFi");
 }
 
 function getMissingSceneConditions() {
@@ -1204,6 +1225,7 @@ scenePhoneWifiButton.addEventListener("click", () => {
   setSceneCondition("phoneWifiConnected", !sceneState.phoneWifiConnected);
   showToast(sceneState.phoneWifiConnected ? "手机已连接 WiFi" : "手机已断开 WiFi");
 });
+sceneSwitchWifiButton.addEventListener("click", switchPhoneWifi);
 sceneWifiButton.addEventListener("click", () => {
   const disconnected = setSceneCondition("einkWifiConnected", !sceneState.einkWifiConnected);
   if (disconnected) return;
