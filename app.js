@@ -44,6 +44,7 @@ const loginEmail = document.getElementById("loginEmail");
 const profileName = document.getElementById("profileName");
 const profileEmail = document.getElementById("profileEmail");
 const sceneConditionGroup = document.getElementById("sceneConditionGroup");
+const scenePhoneWifiButton = document.getElementById("scenePhoneWifiButton");
 const sceneWifiButton = document.getElementById("sceneWifiButton");
 const sceneSameWifiButton = document.getElementById("sceneSameWifiButton");
 const sceneTransferButton = document.getElementById("sceneTransferButton");
@@ -98,7 +99,8 @@ let connectionTimer = null;
 let editingTodoCard = null;
 let editingCountdownCard = null;
 const sceneState = {
-  wifiConnected: false,
+  phoneWifiConnected: false,
+  einkWifiConnected: false,
   appSameWifi: false,
   fileTransferOpen: false,
   isExpanded: false,
@@ -513,18 +515,20 @@ function isHomeViewActive() {
 
 function updateSceneConditionButtons(missing = []) {
   sceneConditionGroup.hidden = !sceneState.isExpanded;
-  sceneWifiButton.setAttribute("aria-pressed", String(sceneState.wifiConnected));
+  scenePhoneWifiButton.setAttribute("aria-pressed", String(sceneState.phoneWifiConnected));
+  sceneWifiButton.setAttribute("aria-pressed", String(sceneState.einkWifiConnected));
   sceneSameWifiButton.setAttribute("aria-pressed", String(sceneState.appSameWifi));
   sceneTransferButton.setAttribute("aria-pressed", String(sceneState.fileTransferOpen));
-  sceneWifiButton.classList.toggle("is-needed", missing.includes("wifi"));
+  scenePhoneWifiButton.classList.toggle("is-needed", missing.includes("phoneWifi"));
+  sceneWifiButton.classList.toggle("is-needed", missing.includes("einkWifi"));
   sceneSameWifiButton.classList.toggle("is-needed", missing.includes("sameWifi"));
   sceneTransferButton.classList.toggle("is-needed", missing.includes("transfer"));
-  sceneSameWifiButton.classList.toggle("is-disabled", !sceneState.wifiConnected);
+  sceneSameWifiButton.classList.toggle("is-disabled", !sceneState.einkWifiConnected);
 }
 
 function setSceneCondition(key, value) {
   sceneState[key] = value;
-  if (key === "wifiConnected" && !value) {
+  if ((key === "phoneWifiConnected" || key === "einkWifiConnected") && !value) {
     sceneState.appSameWifi = false;
   }
   updateSceneConditionButtons();
@@ -534,7 +538,8 @@ function setSceneCondition(key, value) {
 
 function getMissingSceneConditions() {
   const missing = [];
-  if (!sceneState.wifiConnected) missing.push("wifi");
+  if (!sceneState.phoneWifiConnected) missing.push("phoneWifi");
+  if (!sceneState.einkWifiConnected) missing.push("einkWifi");
   if (!sceneState.appSameWifi) missing.push("sameWifi");
   if (!sceneState.fileTransferOpen) missing.push("transfer");
   return missing;
@@ -542,15 +547,17 @@ function getMissingSceneConditions() {
 
 function getSceneConditionLabels(items) {
   return items.map((item) => {
-    if (item === "wifi") return "连接 WiFi";
-    if (item === "sameWifi") return "同一 WiFi";
+    if (item === "phoneWifi") return "手机连接 WiFi";
+    if (item === "einkWifi") return "墨水屏连接 WiFi";
+    if (item === "sameWifi") return "连接同一 WiFi";
     return "文件传输界面";
   });
 }
 
 function updateConnectionCheckPanel() {
   const stepState = {
-    wifi: sceneState.wifiConnected,
+    phoneWifi: sceneState.phoneWifiConnected,
+    einkWifi: sceneState.einkWifiConnected,
     sameWifi: sceneState.appSameWifi,
     transfer: sceneState.fileTransferOpen,
   };
@@ -599,7 +606,8 @@ function connectSceneDevice() {
 }
 
 function stopSceneDevice() {
-  sceneState.wifiConnected = false;
+  sceneState.phoneWifiConnected = false;
+  sceneState.einkWifiConnected = false;
   sceneState.appSameWifi = false;
   sceneState.fileTransferOpen = false;
   sceneState.isExpanded = false;
@@ -1181,14 +1189,18 @@ sheetScrim.addEventListener("click", closeDeviceSheet);
 connectionCloseButton.addEventListener("click", closeConnectionSheet);
 reconnectButton.addEventListener("click", startDeviceConnection);
 connectionDoneButton.addEventListener("click", closeConnectionSheet);
+scenePhoneWifiButton.addEventListener("click", () => {
+  setSceneCondition("phoneWifiConnected", !sceneState.phoneWifiConnected);
+  showToast(sceneState.phoneWifiConnected ? "手机已连接 WiFi" : "手机已断开 WiFi");
+});
 sceneWifiButton.addEventListener("click", () => {
-  setSceneCondition("wifiConnected", !sceneState.wifiConnected);
-  showToast(sceneState.wifiConnected ? "墨水屏已连接 WiFi" : "墨水屏已断开 WiFi");
+  setSceneCondition("einkWifiConnected", !sceneState.einkWifiConnected);
+  showToast(sceneState.einkWifiConnected ? "墨水屏已连接 WiFi" : "墨水屏已断开 WiFi");
 });
 sceneSameWifiButton.addEventListener("click", () => {
-  if (!sceneState.wifiConnected) {
-    updateSceneConditionButtons(["wifi"]);
-    showToast("请先连接 WiFi");
+  if (!sceneState.einkWifiConnected) {
+    updateSceneConditionButtons(["einkWifi"]);
+    showToast("请先让墨水屏连接 WiFi");
     return;
   }
   setSceneCondition("appSameWifi", !sceneState.appSameWifi);

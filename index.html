@@ -1090,7 +1090,7 @@
             <h2>连接设备</h2>
             <p>请按以下步骤操作即可连接</p>
             <ol class="connection-steps">
-              <li data-connection-step="wifi">
+              <li data-connection-step="phoneWifi">
                 <span data-step-index="1">
                   <svg viewBox="0 0 24 24" aria-hidden="true">
                     <path d="m6 12 4 4 8-8" />
@@ -1098,12 +1098,16 @@
                 </span>
                 <strong>手机已连接 WiFi <em>「TP-LINK_5G」</em></strong>
               </li>
-              <li data-connection-step="sameWifi">
+              <li data-connection-step="einkWifi">
                 <span data-step-index="2">2</span>
-                <strong>墨水屏必须连接同一 WiFi</strong>
+                <strong>墨水屏已连接 WiFi</strong>
+              </li>
+              <li data-connection-step="sameWifi">
+                <span data-step-index="3">3</span>
+                <strong>墨水屏和手机连接同一 WiFi</strong>
               </li>
               <li data-connection-step="transfer">
-                <span data-step-index="3">3</span>
+                <span data-step-index="4">4</span>
                 <strong>打开墨水屏「接收文件」页面</strong>
               </li>
             </ol>
@@ -1238,13 +1242,17 @@
           <span>启动墨水屏</span>
         </button>
         <div class="scene-condition-group" id="sceneConditionGroup" aria-label="启动条件" hidden>
+          <button class="scene-condition" type="button" id="scenePhoneWifiButton" aria-pressed="false">
+            <span class="scene-condition-dot" aria-hidden="true"></span>
+            <span>手机连接 WiFi</span>
+          </button>
           <button class="scene-condition" type="button" id="sceneWifiButton" aria-pressed="false">
             <span class="scene-condition-dot" aria-hidden="true"></span>
-            <span>连接 WiFi</span>
+            <span>墨水屏连接 WiFi</span>
           </button>
           <button class="scene-condition" type="button" id="sceneSameWifiButton" aria-pressed="false">
             <span class="scene-condition-dot" aria-hidden="true"></span>
-            <span>同一 WiFi</span>
+            <span>连接同一 WiFi</span>
           </button>
           <button class="scene-condition" type="button" id="sceneTransferButton" aria-pressed="false">
             <span class="scene-condition-dot" aria-hidden="true"></span>
