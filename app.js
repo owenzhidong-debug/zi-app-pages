@@ -24,6 +24,10 @@ const sheetScrim = document.getElementById("sheetScrim");
 const deviceSheet = document.getElementById("deviceSheet");
 const sheetDeviceName = document.getElementById("sheetDeviceName");
 const addDeviceButton = document.getElementById("addDeviceButton");
+const importTransferSheet = document.getElementById("importTransferSheet");
+const importTransferCloseButton = document.getElementById("importTransferCloseButton");
+const importConnectDeviceButton = document.getElementById("importConnectDeviceButton");
+const importCloudTransferButton = document.getElementById("importCloudTransferButton");
 const connectionSheet = document.getElementById("connectionSheet");
 const connectionCloseButton = document.getElementById("connectionCloseButton");
 const connectionDeviceTitle = document.getElementById("connectionDeviceTitle");
@@ -323,6 +327,10 @@ document.querySelectorAll(".action-card").forEach((card) => {
     card.classList.add("is-selected");
     const action = card.dataset.action;
     if (!connectButton.classList.contains("is-connected")) {
+      if (action === "导入图书") {
+        openImportTransferSheet();
+        return;
+      }
       openConnectionSheet();
       return;
     }
@@ -412,6 +420,7 @@ coverZoom.addEventListener("input", () => {
 function openDeviceSheet(deviceName) {
   bindSheet.hidden = true;
   connectionSheet.hidden = true;
+  importTransferSheet.hidden = true;
   phone.classList.remove("scan-bind-mode");
   sheetDeviceName.textContent = deviceName;
   sheetScrim.hidden = false;
@@ -421,6 +430,7 @@ function openDeviceSheet(deviceName) {
 function openBindSheet() {
   deviceSheet.hidden = true;
   connectionSheet.hidden = true;
+  importTransferSheet.hidden = true;
   sheetScrim.hidden = true;
   bindSheet.hidden = false;
   phone.classList.add("scan-bind-mode");
@@ -459,6 +469,7 @@ function openConnectionSheet() {
   clearTimeout(connectionTimer);
   bindSheet.hidden = true;
   deviceSheet.hidden = true;
+  importTransferSheet.hidden = true;
   connectionDeviceTitle.textContent = activeProfileDevice;
   connectionSuccessDevice.textContent = activeProfileDevice;
   connectionSheet.classList.remove("is-connecting", "is-success");
@@ -472,6 +483,27 @@ function closeConnectionSheet() {
   clearTimeout(connectionTimer);
   connectionSheet.hidden = true;
   connectionSheet.classList.remove("is-connecting", "is-success");
+  sheetScrim.hidden = true;
+}
+
+function openImportTransferSheet() {
+  if (!getBoundDeviceRows().length) {
+    openBindSheet();
+    showToast("请先绑定设备");
+    return;
+  }
+  clearTimeout(connectionTimer);
+  bindSheet.hidden = true;
+  deviceSheet.hidden = true;
+  connectionSheet.hidden = true;
+  connectionSheet.classList.remove("is-connecting", "is-success");
+  importTransferSheet.hidden = false;
+  sheetScrim.hidden = false;
+  phone.classList.remove("scan-bind-mode");
+}
+
+function closeImportTransferSheet() {
+  importTransferSheet.hidden = true;
   sheetScrim.hidden = true;
 }
 
@@ -659,6 +691,7 @@ function closeDeviceSheet() {
   deviceSheet.hidden = true;
   connectionSheet.hidden = true;
   connectionSheet.classList.remove("is-connecting", "is-success");
+  importTransferSheet.hidden = true;
   bindSheet.hidden = true;
   phone.classList.remove("scan-bind-mode");
   syncDeviceState();
@@ -1221,6 +1254,12 @@ sheetScrim.addEventListener("click", closeDeviceSheet);
 connectionCloseButton.addEventListener("click", closeConnectionSheet);
 reconnectButton.addEventListener("click", startDeviceConnection);
 connectionDoneButton.addEventListener("click", closeConnectionSheet);
+importTransferCloseButton.addEventListener("click", closeImportTransferSheet);
+importConnectDeviceButton.addEventListener("click", openConnectionSheet);
+importCloudTransferButton.addEventListener("click", () => {
+  closeImportTransferSheet();
+  showToast("已选择云端传输");
+});
 scenePhoneWifiButton.addEventListener("click", () => {
   setSceneCondition("phoneWifiConnected", !sceneState.phoneWifiConnected);
   showToast(sceneState.phoneWifiConnected ? "手机已连接 WiFi" : "手机已断开 WiFi");

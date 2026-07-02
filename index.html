@@ -1078,6 +1078,49 @@
           </button>
         </section>
 
+        <section class="import-transfer-sheet" id="importTransferSheet" aria-label="选择导入图书方式" hidden>
+          <button class="import-transfer-close" type="button" id="importTransferCloseButton" aria-label="关闭导入方式面板">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m6 6 12 12" />
+              <path d="m18 6-12 12" />
+            </svg>
+          </button>
+          <h2>导入图书</h2>
+          <p>未连接到墨水屏，请先连接设备或使用云端传输</p>
+          <div class="import-transfer-options">
+            <button type="button" id="importConnectDeviceButton">
+              <span class="import-transfer-icon import-transfer-icon-wifi">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M5 13a10 10 0 0 1 14 0" />
+                  <path d="M8.5 16.5a5 5 0 0 1 7 0" />
+                  <path d="M12 20h.01" />
+                </svg>
+              </span>
+              <span>
+                <strong>连接设备后传输</strong>
+                <em>通过局域网 wifi 传输，速度更快</em>
+              </span>
+              <svg class="import-transfer-arrow" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m9 18 6-6-6-6" />
+              </svg>
+            </button>
+            <button type="button" id="importCloudTransferButton">
+              <span class="import-transfer-icon import-transfer-icon-cloud">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M17.5 18H7a4 4 0 1 1 .8-7.9A5.5 5.5 0 0 1 18.4 12H19a3 3 0 0 1-1.5 6z" />
+                </svg>
+              </span>
+              <span>
+                <strong>使用云端传输</strong>
+                <em>先上传云端，随后在设备下载</em>
+              </span>
+              <svg class="import-transfer-arrow" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m9 18 6-6-6-6" />
+              </svg>
+            </button>
+          </div>
+        </section>
+
         <section class="connection-sheet" id="connectionSheet" aria-label="连接设备" hidden>
           <button class="connection-close" type="button" id="connectionCloseButton" aria-label="关闭连接面板">
             <svg viewBox="0 0 24 24" aria-hidden="true">
