@@ -5631,6 +5631,684 @@ svg {
   }
 }
 
+@media (max-width: 9999px) {
+  .phone {
+    font-size: 14px;
+  }
+
+  .tabbar {
+    height: 72px;
+  }
+
+  .tab-item {
+    min-height: 72px;
+    gap: 3px;
+    font-size: 12px;
+  }
+
+  .tab-item svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .auth-view,
+  .phone.server-mode .server-view {
+    padding: 24px;
+  }
+
+  .auth-title h1 {
+    margin-bottom: 18px;
+    font-size: 28px;
+  }
+
+  .auth-form {
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .auth-form.active {
+    gap: 14px;
+  }
+
+  .auth-form input {
+    height: 48px;
+    border-radius: 14px;
+    font-size: 15px;
+  }
+
+  .auth-primary {
+    height: 52px;
+    font-size: 16px;
+  }
+
+  .auth-helper {
+    font-size: 13px;
+  }
+
+  .server-panel {
+    max-width: none;
+    gap: 22px;
+  }
+
+  .server-card {
+    min-height: 92px;
+    padding: 18px;
+    gap: 14px;
+    border-radius: 20px;
+  }
+
+  .server-mark {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    font-size: 14px;
+  }
+
+  .server-card strong {
+    font-size: 21px;
+  }
+
+  .hero {
+    height: 286px;
+    min-height: 286px;
+  }
+
+  .device-preview {
+    width: 220px;
+    height: 286px;
+  }
+
+  .device-preview::after {
+    left: 52px;
+    right: 26px;
+    bottom: 24px;
+    height: 34px;
+    filter: blur(16px);
+  }
+
+  .tablet {
+    width: 150px;
+    height: 240px;
+    padding: 7px;
+    border-radius: 20px;
+  }
+
+  .tablet-screen {
+    border-radius: 12px;
+  }
+
+  .home-panel {
+    height: calc(100% - 286px - 72px);
+    min-height: 0;
+    padding: 14px 14px 18px;
+  }
+
+  .phone.no-bound-devices .home-panel {
+    height: calc(100% - 72px);
+    padding: 0 22px;
+  }
+
+  .home-bind-empty {
+    gap: 18px;
+  }
+
+  .home-bind-empty h1 {
+    font-size: 30px;
+  }
+
+  .home-bind-empty p {
+    max-width: 286px;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+
+  .home-bind-empty button {
+    min-width: 216px;
+    min-height: 56px;
+    padding: 0 20px;
+    gap: 10px;
+    border-radius: 16px;
+  }
+
+  .home-bind-empty button svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .home-bind-empty button span {
+    font-size: 18px;
+  }
+
+  .device-row {
+    min-height: 36px;
+    gap: 8px;
+  }
+
+  .device-name {
+    max-width: 198px;
+    min-height: 36px;
+    gap: 7px;
+    font-size: 19px;
+  }
+
+  .device-name svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .connection-pill {
+    min-width: 90px;
+    min-height: 34px;
+    padding: 0 10px;
+    gap: 5px;
+    border-width: 1px;
+    font-size: 14px;
+  }
+
+  .connection-pill svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .last-sync {
+    margin: 6px 0 14px;
+    font-size: 15px;
+  }
+
+  .device-menu {
+    top: 54px;
+    left: 18px;
+    right: 18px;
+    border-radius: 16px;
+  }
+
+  .action-grid {
+    gap: 12px;
+  }
+
+  .action-card {
+    min-height: 112px;
+    gap: 12px;
+    border-width: 1px;
+    border-radius: 16px;
+    font-size: 17px;
+  }
+
+  .icon-circle {
+    width: 52px;
+    height: 52px;
+  }
+
+  .icon-circle svg {
+    width: 23px;
+    height: 23px;
+  }
+
+  .bookstore-view,
+  .gallery-view,
+  .profile-view,
+  .apps-view,
+  .file-manager-view {
+    height: calc(100% - 72px);
+    padding: 22px 14px 88px;
+  }
+
+  .search-box {
+    min-height: 48px;
+    margin-top: 0;
+    border-radius: 16px;
+  }
+
+  .search-box svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .search-box input {
+    font-size: 14px;
+  }
+
+  .category-chip {
+    min-height: 36px;
+    padding: 0 14px;
+    font-size: 14px;
+  }
+
+  .section-head h2 {
+    font-size: 20px;
+  }
+
+  .featured-book {
+    min-height: 150px;
+    padding: 16px;
+    grid-template-columns: 1fr 82px;
+    border-radius: 20px;
+  }
+
+  .featured-copy strong {
+    font-size: 23px;
+  }
+
+  .featured-copy span,
+  .featured-copy span:last-child,
+  .gallery-summary span,
+  .book-card small,
+  .recommend-row small {
+    font-size: 12px;
+  }
+
+  .featured-cover {
+    width: 78px;
+    height: 108px;
+  }
+
+  .book-rail {
+    grid-auto-columns: 106px;
+    gap: 13px;
+  }
+
+  .book-card {
+    min-height: 194px;
+    grid-template-rows: 132px auto auto;
+  }
+
+  .book-cover {
+    width: 102px;
+    height: 132px;
+    border-radius: 12px;
+  }
+
+  .book-card strong,
+  .recommend-row strong {
+    font-size: 14px;
+  }
+
+  .recommend-row {
+    min-height: 72px;
+    grid-template-columns: 42px 1fr 20px;
+    gap: 10px;
+    border-radius: 16px;
+  }
+
+  .mini-cover {
+    width: 40px;
+    height: 54px;
+  }
+
+  .gallery-tabs {
+    min-height: 46px;
+    border-radius: 16px;
+  }
+
+  .gallery-tab {
+    min-height: 38px;
+    font-size: 15px;
+  }
+
+  .gallery-summary {
+    margin-top: 14px;
+    padding: 14px 16px;
+    border-radius: 16px;
+  }
+
+  .resource-card {
+    margin-bottom: 12px;
+    border-radius: 16px;
+  }
+
+  .resource-card strong {
+    font-size: 14px;
+  }
+
+  .template-tile {
+    margin-bottom: 12px;
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .template-tile .template-preview {
+    width: 98px;
+    height: 132px;
+  }
+
+  .template-tile .template-copy-block strong {
+    font-size: 17px;
+  }
+
+  .profile-card {
+    min-height: 96px;
+    padding: 16px;
+    grid-template-columns: 56px 1fr 18px;
+    gap: 13px;
+    border-radius: 18px;
+  }
+
+  .profile-avatar {
+    width: 56px;
+    height: 56px;
+  }
+
+  .profile-avatar svg {
+    width: 30px;
+    height: 30px;
+  }
+
+  .profile-info strong {
+    font-size: 20px;
+  }
+
+  .profile-info span {
+    font-size: 14px;
+  }
+
+  .profile-section {
+    margin-top: 16px;
+    border-radius: 18px;
+  }
+
+  .profile-section-head {
+    min-height: 56px;
+    padding: 0 16px;
+  }
+
+  .profile-section-head h2 {
+    font-size: 18px;
+  }
+
+  .device-list-row,
+  .action-list button {
+    min-height: 60px;
+    padding: 0 16px;
+    font-size: 16px;
+  }
+
+  .action-list button {
+    grid-template-columns: 24px 1fr 18px;
+    gap: 12px;
+  }
+
+  .action-list svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .apps-hero-card {
+    min-height: 96px;
+    padding: 16px;
+    grid-template-columns: 52px 1fr;
+    gap: 14px;
+    border-radius: 18px;
+  }
+
+  .apps-hero-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+  }
+
+  .apps-hero-icon svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .apps-hero-card strong {
+    font-size: 20px;
+  }
+
+  .apps-hero-card small {
+    font-size: 12px;
+  }
+
+  .app-grid {
+    gap: 12px;
+  }
+
+  .app-card {
+    min-height: 82px;
+    padding: 0 42px 0 14px;
+    grid-template-columns: 40px 1fr;
+    gap: 12px;
+    border-radius: 20px;
+  }
+
+  .app-icon {
+    width: 38px;
+    height: 38px;
+  }
+
+  .app-icon svg {
+    width: 21px;
+    height: 21px;
+  }
+
+  .app-card strong {
+    font-size: 18px;
+  }
+
+  .app-more {
+    right: 16px;
+    font-size: 21px;
+  }
+
+  .countdown-view,
+  .todo-view,
+  .utility-app-view {
+    grid-template-rows: 58px 1fr 76px;
+  }
+
+  .countdown-header,
+  .todo-header,
+  .utility-app-header {
+    grid-template-columns: 48px 1fr 48px;
+  }
+
+  .countdown-header h1,
+  .todo-header h1,
+  .utility-app-header h1 {
+    font-size: 20px;
+  }
+
+  .countdown-back,
+  .countdown-add,
+  .todo-back,
+  .todo-add,
+  .utility-back,
+  .utility-add {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .countdown-add,
+  .todo-add,
+  .utility-add {
+    font-size: 30px;
+  }
+
+  .countdown-scroll,
+  .todo-scroll,
+  .utility-app-scroll {
+    padding: 14px 14px 18px;
+  }
+
+  .countdown-card header {
+    min-height: 70px;
+    padding: 0 16px;
+  }
+
+  .countdown-card header strong,
+  .todo-main strong,
+  .word-book-list strong,
+  .word-list strong {
+    font-size: 17px;
+  }
+
+  .countdown-card header small,
+  .todo-main small,
+  .word-book-list small,
+  .word-list small {
+    font-size: 13px;
+  }
+
+  .countdown-days {
+    min-height: 104px;
+    gap: 8px;
+  }
+
+  .countdown-days strong {
+    font-size: 40px;
+  }
+
+  .countdown-days span {
+    font-size: 15px;
+  }
+
+  .countdown-footer,
+  .todo-footer,
+  .utility-app-footer {
+    padding: 10px 14px 14px;
+  }
+
+  .countdown-footer button,
+  .todo-footer button,
+  .utility-app-footer button {
+    min-height: 48px;
+    border-radius: 12px;
+    font-size: 15px;
+  }
+
+  .todo-card {
+    min-height: 78px;
+    padding: 14px;
+    grid-template-columns: 34px 1fr auto;
+    border-radius: 16px;
+  }
+
+  .todo-check {
+    width: 34px;
+    height: 34px;
+  }
+
+  .word-detail-card strong {
+    font-size: 34px;
+  }
+
+  .word-detail-card p {
+    font-size: 17px;
+  }
+
+  .word-card,
+  .market-summary-card {
+    min-height: 140px;
+    padding: 18px;
+  }
+
+  .pet-stage-card strong,
+  .word-card strong {
+    font-size: 30px;
+  }
+
+  .market-summary-card strong {
+    font-size: 36px;
+  }
+
+  .file-manager-view {
+    padding-top: 18px;
+  }
+
+  .manager-header {
+    min-height: 54px;
+  }
+
+  .manager-header h1 {
+    font-size: 22px;
+  }
+
+  .file-row {
+    min-height: 64px;
+    padding: 0 14px;
+    grid-template-columns: 26px 1fr 34px;
+  }
+
+  .file-row strong {
+    font-size: 14px;
+  }
+
+  .file-row small {
+    font-size: 12px;
+  }
+
+  .device-sheet button {
+    min-height: 64px;
+    padding: 0 22px;
+    font-size: 17px;
+  }
+
+  .connection-sheet {
+    min-height: 430px;
+    padding: 30px 22px 28px;
+    border-radius: 22px 22px 0 0;
+  }
+
+  .connection-close {
+    top: 18px;
+    right: 18px;
+    width: 36px;
+    height: 36px;
+  }
+
+  .connection-sheet h2 {
+    font-size: 23px;
+  }
+
+  .connection-check-panel p {
+    margin: 24px 0 16px;
+    font-size: 15px;
+  }
+
+  .connection-steps {
+    gap: 12px;
+  }
+
+  .connection-steps strong {
+    font-size: 15px;
+  }
+
+  .connection-primary {
+    margin-top: 112px;
+  }
+
+  .connection-primary,
+  .connection-progress-button {
+    min-height: 54px;
+    border-radius: 15px;
+    font-size: 17px;
+  }
+
+  .connection-device-preview {
+    width: 212px;
+    height: 234px;
+    margin: 32px auto 42px;
+  }
+
+  .connection-device-preview::before {
+    width: 188px;
+    height: 188px;
+  }
+
+  .connection-device-frame {
+    width: 96px;
+    height: 156px;
+    padding: 6px;
+  }
+
+  .toast {
+    bottom: 18px;
+    min-width: 176px;
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
