@@ -527,13 +527,24 @@ function updateSceneConditionButtons(missing = []) {
 }
 
 function setSceneCondition(key, value) {
+  const shouldDisconnect = key !== "phoneWifiConnected" && value === false && (
+    connectButton.classList.contains("is-connected") || connectionSheet.classList.contains("is-connecting")
+  );
   sceneState[key] = value;
   if ((key === "phoneWifiConnected" || key === "einkWifiConnected") && !value) {
     sceneState.appSameWifi = false;
   }
   updateSceneConditionButtons();
   updateConnectionCheckPanel();
+  if (shouldDisconnect) {
+    clearTimeout(connectionTimer);
+    closeConnectionSheet();
+    setDeviceConnection(false);
+    showToast("设备已断开");
+    return true;
+  }
   maybeStartSceneDevice();
+  return false;
 }
 
 function getMissingSceneConditions() {
@@ -606,12 +617,12 @@ function connectSceneDevice() {
 }
 
 function stopSceneDevice() {
-  sceneState.phoneWifiConnected = false;
   sceneState.einkWifiConnected = false;
   sceneState.appSameWifi = false;
   sceneState.fileTransferOpen = false;
   sceneState.isExpanded = false;
   updateSceneConditionButtons();
+  updateConnectionCheckPanel();
   if (connectButton.classList.contains("is-connected")) {
     closeConnectionSheet();
     setDeviceConnection(false);
@@ -1194,7 +1205,8 @@ scenePhoneWifiButton.addEventListener("click", () => {
   showToast(sceneState.phoneWifiConnected ? "手机已连接 WiFi" : "手机已断开 WiFi");
 });
 sceneWifiButton.addEventListener("click", () => {
-  setSceneCondition("einkWifiConnected", !sceneState.einkWifiConnected);
+  const disconnected = setSceneCondition("einkWifiConnected", !sceneState.einkWifiConnected);
+  if (disconnected) return;
   showToast(sceneState.einkWifiConnected ? "墨水屏已连接 WiFi" : "墨水屏已断开 WiFi");
 });
 sceneSameWifiButton.addEventListener("click", () => {
@@ -1203,11 +1215,13 @@ sceneSameWifiButton.addEventListener("click", () => {
     showToast("请先让墨水屏连接 WiFi");
     return;
   }
-  setSceneCondition("appSameWifi", !sceneState.appSameWifi);
+  const disconnected = setSceneCondition("appSameWifi", !sceneState.appSameWifi);
+  if (disconnected) return;
   showToast(sceneState.appSameWifi ? "已连接同一个 WiFi" : "已切换到其他 WiFi");
 });
 sceneTransferButton.addEventListener("click", () => {
-  setSceneCondition("fileTransferOpen", !sceneState.fileTransferOpen);
+  const disconnected = setSceneCondition("fileTransferOpen", !sceneState.fileTransferOpen);
+  if (disconnected) return;
   showToast(sceneState.fileTransferOpen ? "已打开文件传输界面" : "已退出文件传输界面");
 });
 sceneStartButton.addEventListener("click", startSceneDevice);

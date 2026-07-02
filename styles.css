@@ -132,6 +132,13 @@ svg {
     box-shadow 180ms ease;
 }
 
+.scene-condition-standalone {
+  border: 1px solid rgba(216, 221, 227, 0.95);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 10px 24px rgba(20, 26, 34, 0.08);
+  backdrop-filter: blur(14px);
+}
+
 .scene-condition[aria-pressed="true"] {
   background: #ecfdf3;
   color: #166534;
