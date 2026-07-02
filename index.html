@@ -153,6 +153,16 @@
               <span>导入字体</span>
             </button>
           </div>
+
+          <input class="book-file-input" id="bookFileInput" type="file" accept=".epub,.txt,application/epub+zip,text/plain" hidden />
+
+          <section class="recent-transfer" id="recentTransfer" aria-label="最近传输" hidden>
+            <div class="recent-transfer-head">
+              <h2>最近传输</h2>
+              <button type="button" id="viewAllTransferButton">查看全部</button>
+            </div>
+            <div class="recent-transfer-list" id="recentTransferList"></div>
+          </section>
         </section>
 
         <section class="bookstore-view" id="bookstoreView" aria-label="书城">

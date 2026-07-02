@@ -8,6 +8,10 @@ const homeBindEmpty = document.getElementById("homeBindEmpty");
 const homeScanBindButton = document.getElementById("homeScanBindButton");
 const homeDeviceRow = document.getElementById("homeDeviceRow");
 const homeActionGrid = document.getElementById("homeActionGrid");
+const bookFileInput = document.getElementById("bookFileInput");
+const recentTransfer = document.getElementById("recentTransfer");
+const recentTransferList = document.getElementById("recentTransferList");
+const viewAllTransferButton = document.getElementById("viewAllTransferButton");
 const deviceMenuButton = document.getElementById("deviceMenuButton");
 const deviceMenu = document.getElementById("deviceMenu");
 const phone = document.querySelector(".phone");
@@ -231,6 +235,73 @@ function escapeHTML(value) {
   })[char]);
 }
 
+function formatFileSize(bytes) {
+  if (!Number.isFinite(bytes) || bytes <= 0) return "0 KB";
+  if (bytes >= 1024 * 1024) return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+  return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+}
+
+function isSupportedBookFile(file) {
+  return /\.(epub|txt)$/i.test(file.name);
+}
+
+function getTransferTimeLabel() {
+  const now = new Date();
+  return `今天 ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+}
+
+function createTransferRow(file) {
+  const row = document.createElement("article");
+  row.className = "transfer-row";
+  row.dataset.progress = "0";
+  row.innerHTML = `
+    <span class="transfer-file-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24">
+        <path d="M7 3h7l4 4v14H7z" />
+        <path d="M14 3v5h5" />
+        <path d="M10 12h5" />
+        <path d="M10 16h7" />
+      </svg>
+    </span>
+    <span class="transfer-info">
+      <strong>${escapeHTML(file.name)}</strong>
+      <small><span class="transfer-status">传输中</span> · ${getTransferTimeLabel()} · ${formatFileSize(file.size)}</small>
+    </span>
+    <span class="transfer-side">
+      <span class="transfer-chip">局域网</span>
+      <span class="transfer-progress">0%</span>
+    </span>
+  `;
+  recentTransferList.prepend(row);
+  [...recentTransferList.children].slice(3).forEach((item) => item.remove());
+  recentTransfer.hidden = false;
+  return row;
+}
+
+function updateTransferRow(row, progress) {
+  const nextProgress = Math.min(100, progress);
+  row.dataset.progress = String(nextProgress);
+  row.querySelector(".transfer-progress").textContent = nextProgress >= 100 ? "完成" : `${nextProgress}%`;
+  if (nextProgress >= 100) {
+    row.classList.add("is-complete");
+    row.querySelector(".transfer-status").textContent = "已完成";
+  }
+}
+
+function startBookTransfer(file) {
+  const row = createTransferRow(file);
+  let progress = 0;
+  showToast("开始传输图书");
+  const timer = setInterval(() => {
+    progress += Math.floor(Math.random() * 14) + 10;
+    updateTransferRow(row, progress);
+    if (progress >= 100) {
+      clearInterval(timer);
+      showToast("图书已导入墨水屏");
+    }
+  }, 520);
+}
+
 function setProfileUser(user) {
   profileName.textContent = user.name || fallbackUser.name;
   profileEmail.textContent = user.email || fallbackUser.email;
@@ -332,6 +403,11 @@ document.querySelectorAll(".action-card").forEach((card) => {
         return;
       }
       openConnectionSheet();
+      return;
+    }
+    if (action === "导入图书") {
+      bookFileInput.value = "";
+      bookFileInput.click();
       return;
     }
     showToast(action);
@@ -745,6 +821,7 @@ function syncDeviceState(preferredDevice = activeProfileDevice) {
     homeBindEmpty.hidden = false;
     homeDeviceRow.hidden = true;
     homeActionGrid.hidden = true;
+    recentTransfer.hidden = true;
     lastSync.hidden = true;
     deviceMenuButton.querySelector("span").textContent = "绑定设备";
     deviceMenuButton.setAttribute("aria-expanded", "false");
@@ -761,6 +838,7 @@ function syncDeviceState(preferredDevice = activeProfileDevice) {
   homeBindEmpty.hidden = true;
   homeDeviceRow.hidden = false;
   homeActionGrid.hidden = false;
+  recentTransfer.hidden = recentTransferList.children.length === 0;
   lastSync.hidden = false;
   const deviceNames = rows.map((row) => row.dataset.profileDevice);
   const nextDevice = deviceNames.includes(preferredDevice) ? preferredDevice : deviceNames[0];
@@ -1260,6 +1338,18 @@ importCloudTransferButton.addEventListener("click", () => {
   closeImportTransferSheet();
   showToast("已选择云端传输");
 });
+bookFileInput.addEventListener("change", () => {
+  const file = bookFileInput.files?.[0];
+  if (!file) return;
+  if (!isSupportedBookFile(file)) {
+    showToast("仅支持 epub 或 txt 文件");
+    bookFileInput.value = "";
+    return;
+  }
+  startBookTransfer(file);
+  bookFileInput.value = "";
+});
+viewAllTransferButton.addEventListener("click", () => showToast("查看全部传输"));
 scenePhoneWifiButton.addEventListener("click", () => {
   setSceneCondition("phoneWifiConnected", !sceneState.phoneWifiConnected);
   showToast(sceneState.phoneWifiConnected ? "手机已连接 WiFi" : "手机已断开 WiFi");
