@@ -574,8 +574,15 @@ svg {
   height: calc(55% - 96px);
   min-height: 410px;
   padding: 25px 32px 32px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   border-top: 1px solid rgba(222, 225, 230, 0.7);
   background: var(--paper);
+}
+
+.home-panel::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 .phone.no-bound-devices .hero {
@@ -586,6 +593,7 @@ svg {
   height: calc(100% - 96px);
   min-height: 0;
   padding: 0 32px;
+  overflow: hidden;
   display: grid;
   place-items: center;
   border-top: 0;
