@@ -268,8 +268,7 @@ connectButton.addEventListener("click", () => {
     return;
   }
   if (connectButton.classList.contains("is-connected")) {
-    setDeviceConnection(false);
-    showToast("设备已断开");
+    showToast("设备已连接");
     return;
   }
   openConnectionSheet();
@@ -305,6 +304,10 @@ document.querySelectorAll(".action-card").forEach((card) => {
     document.querySelectorAll(".action-card").forEach((item) => item.classList.remove("is-selected"));
     card.classList.add("is-selected");
     const action = card.dataset.action;
+    if (!connectButton.classList.contains("is-connected")) {
+      openConnectionSheet();
+      return;
+    }
     showToast(action);
   });
 });
