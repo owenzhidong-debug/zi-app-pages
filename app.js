@@ -112,6 +112,7 @@ let connectionTimer = null;
 let editingTodoCard = null;
 let editingCountdownCard = null;
 const transferTasks = [];
+let hasTransferActivityThisSession = false;
 const sceneState = {
   phoneWifiConnected: false,
   einkWifiConnected: false,
@@ -279,13 +280,25 @@ function renderTransferDetailList() {
 }
 
 function updateTransferSummary() {
+  if (!getBoundDeviceRows().length || !hasTransferActivityThisSession) {
+    transferSummaryCard.hidden = true;
+    return;
+  }
+
   const activeTasks = transferTasks.filter((task) => task.progress < 100);
-  transferSummaryCard.hidden = activeTasks.length === 0;
-  if (!activeTasks.length) return;
+  transferSummaryCard.hidden = false;
+
+  if (!activeTasks.length) {
+    const completedCount = transferTasks.filter((task) => task.progress >= 100).length;
+    transferSummaryTitle.textContent = `${completedCount} 个文件已完成`;
+    transferSummaryMeta.textContent = transferTasks[0]?.name || "本次传输已完成";
+    transferSummaryPercent.textContent = "完成";
+    return;
+  }
 
   const averageProgress = Math.round(activeTasks.reduce((sum, task) => sum + task.progress, 0) / activeTasks.length);
   transferSummaryTitle.textContent = `${activeTasks.length} 个文件传输中`;
-  transferSummaryMeta.textContent = activeTasks.length === 1 ? activeTasks[0].name : "点击查看具体进度";
+  transferSummaryMeta.textContent = activeTasks.length === 1 ? activeTasks[0].name : `${transferTasks.length} 个传输任务`;
   transferSummaryPercent.textContent = `${averageProgress}%`;
 }
 
@@ -295,6 +308,7 @@ function renderTransferViews() {
 }
 
 function createTransferTask(file) {
+  hasTransferActivityThisSession = true;
   const task = {
     id: Date.now() + Math.random(),
     name: file.name,
