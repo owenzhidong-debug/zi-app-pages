@@ -27,7 +27,9 @@ const addDeviceButton = document.getElementById("addDeviceButton");
 const connectionSheet = document.getElementById("connectionSheet");
 const connectionCloseButton = document.getElementById("connectionCloseButton");
 const connectionDeviceTitle = document.getElementById("connectionDeviceTitle");
+const connectionSuccessDevice = document.getElementById("connectionSuccessDevice");
 const reconnectButton = document.getElementById("reconnectButton");
+const connectionDoneButton = document.getElementById("connectionDoneButton");
 const bindSheet = document.getElementById("bindSheet");
 const boundDeviceList = document.getElementById("boundDeviceList");
 const deviceEmptyState = document.getElementById("deviceEmptyState");
@@ -40,6 +42,8 @@ const loginForm = document.getElementById("loginForm");
 const loginEmail = document.getElementById("loginEmail");
 const profileName = document.getElementById("profileName");
 const profileEmail = document.getElementById("profileEmail");
+const sceneStartButton = document.getElementById("sceneStartButton");
+const sceneStopButton = document.getElementById("sceneStopButton");
 const todoBackButton = document.getElementById("todoBackButton");
 const todoAddButton = document.getElementById("todoAddButton");
 const todoList = document.getElementById("todoList");
@@ -415,13 +419,35 @@ function setDeviceConnection(connected) {
   lastSync.textContent = connected ? "上次连接：2 小时前" : "上次连接：2 天前";
 }
 
+function ensureSimulatedDevice(name = "Darwin's Onyx epaper") {
+  const exists = boundDeviceList.querySelector(`[data-profile-device="${CSS.escape(name)}"]`);
+  if (exists) {
+    syncDeviceState(name);
+    return name;
+  }
+
+  const row = document.createElement("button");
+  row.className = "device-list-row";
+  row.type = "button";
+  row.dataset.profileDevice = name;
+  row.innerHTML = `
+    <span>${escapeHTML(name)}</span>
+    <span class="device-spacer"></span>
+    <span class="device-more" aria-hidden="true">•••</span>
+  `;
+  boundDeviceList.append(row);
+  syncDeviceState(name);
+  return name;
+}
+
 function openConnectionSheet() {
   if (!activeProfileDevice) return;
   clearTimeout(connectionTimer);
   bindSheet.hidden = true;
   deviceSheet.hidden = true;
   connectionDeviceTitle.textContent = activeProfileDevice;
-  connectionSheet.classList.remove("is-connecting");
+  connectionSuccessDevice.textContent = activeProfileDevice;
+  connectionSheet.classList.remove("is-connecting", "is-success");
   connectionSheet.hidden = false;
   sheetScrim.hidden = false;
   phone.classList.remove("scan-bind-mode");
@@ -430,17 +456,61 @@ function openConnectionSheet() {
 function closeConnectionSheet() {
   clearTimeout(connectionTimer);
   connectionSheet.hidden = true;
-  connectionSheet.classList.remove("is-connecting");
+  connectionSheet.classList.remove("is-connecting", "is-success");
   sheetScrim.hidden = true;
 }
 
 function startDeviceConnection() {
+  if (!activeProfileDevice) return;
+  connectionDeviceTitle.textContent = activeProfileDevice;
+  connectionSuccessDevice.textContent = activeProfileDevice;
+  connectionSheet.classList.remove("is-success");
   connectionSheet.classList.add("is-connecting");
   connectionTimer = setTimeout(() => {
     setDeviceConnection(true);
-    closeConnectionSheet();
+    connectionSheet.classList.remove("is-connecting");
+    connectionSheet.classList.add("is-success");
     showToast("设备已连接");
   }, 1200);
+}
+
+function isHomeViewActive() {
+  const blockedModes = [
+    "auth-mode",
+    "server-mode",
+    "bookstore-mode",
+    "gallery-mode",
+    "apps-mode",
+    "profile-mode",
+    "cover-editor-mode",
+    "file-manager-mode",
+    "todo-mode",
+    "countdown-mode",
+    "scan-bind-mode",
+    ...utilityModes,
+  ];
+  return !blockedModes.some((mode) => phone.classList.contains(mode));
+}
+
+function startSceneDevice() {
+  if (!isHomeViewActive()) {
+    showToast("请先回到首页");
+    return;
+  }
+  const deviceName = ensureSimulatedDevice("Darwin's Onyx epaper");
+  activateHomeView(deviceName);
+  openConnectionSheet();
+  startDeviceConnection();
+}
+
+function stopSceneDevice() {
+  if (connectButton.classList.contains("is-connected")) {
+    closeConnectionSheet();
+    setDeviceConnection(false);
+    showToast("墨水屏已关闭");
+    return;
+  }
+  showToast("设备未连接");
 }
 
 function closeDeviceSheet() {
@@ -448,7 +518,7 @@ function closeDeviceSheet() {
   sheetScrim.hidden = true;
   deviceSheet.hidden = true;
   connectionSheet.hidden = true;
-  connectionSheet.classList.remove("is-connecting");
+  connectionSheet.classList.remove("is-connecting", "is-success");
   bindSheet.hidden = true;
   phone.classList.remove("scan-bind-mode");
   syncDeviceState();
@@ -1008,6 +1078,9 @@ syncDeviceState();
 sheetScrim.addEventListener("click", closeDeviceSheet);
 connectionCloseButton.addEventListener("click", closeConnectionSheet);
 reconnectButton.addEventListener("click", startDeviceConnection);
+connectionDoneButton.addEventListener("click", closeConnectionSheet);
+sceneStartButton.addEventListener("click", startSceneDevice);
+sceneStopButton.addEventListener("click", stopSceneDevice);
 scanBackButton.addEventListener("click", closeDeviceSheet);
 scanGalleryButton.addEventListener("click", () => showToast("从图库选择二维码"));
 

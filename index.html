@@ -1128,6 +1128,25 @@
             </div>
             <button class="connection-progress-button" type="button" disabled>连接中</button>
           </div>
+
+          <div class="connection-success-panel">
+            <div class="connection-success-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="m6 12 4 4 8-8" />
+              </svg>
+            </div>
+            <h2>连接成功</h2>
+            <p id="connectionSuccessDevice">Darwin's Onyx epaper</p>
+            <section class="connection-success-card" aria-label="可进行操作">
+              <strong>现在可以进行以下操作：</strong>
+              <ul>
+                <li>传输图书和文档</li>
+                <li>导入壁纸和图片</li>
+                <li>安装自定义字体</li>
+              </ul>
+            </section>
+            <button class="connection-done-button" type="button" id="connectionDoneButton">完成</button>
+          </div>
         </section>
 
         <section class="scan-bind-view" id="bindSheet" aria-label="扫码添加设备" hidden>
@@ -1213,6 +1232,15 @@
           </button>
         </nav>
       </section>
+
+      <aside class="scene-controls" aria-label="场景模拟">
+        <button class="scene-button scene-button-start" type="button" id="sceneStartButton">
+          <span>启动墨水屏</span>
+        </button>
+        <button class="scene-button scene-button-stop" type="button" id="sceneStopButton">
+          <span>关闭墨水屏</span>
+        </button>
+      </aside>
     </main>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
