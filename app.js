@@ -42,6 +42,8 @@ const loginForm = document.getElementById("loginForm");
 const loginEmail = document.getElementById("loginEmail");
 const profileName = document.getElementById("profileName");
 const profileEmail = document.getElementById("profileEmail");
+const sceneWifiButton = document.getElementById("sceneWifiButton");
+const sceneTransferButton = document.getElementById("sceneTransferButton");
 const sceneStartButton = document.getElementById("sceneStartButton");
 const sceneStopButton = document.getElementById("sceneStopButton");
 const todoBackButton = document.getElementById("todoBackButton");
@@ -92,6 +94,10 @@ let toastTimer = null;
 let connectionTimer = null;
 let editingTodoCard = null;
 let editingCountdownCard = null;
+const sceneState = {
+  sameWifi: false,
+  fileTransferOpen: false,
+};
 const fallbackUser = {
   name: "Darwin",
   email: "darwin@example.com",
@@ -492,9 +498,35 @@ function isHomeViewActive() {
   return !blockedModes.some((mode) => phone.classList.contains(mode));
 }
 
+function updateSceneConditionButtons(missing = []) {
+  sceneWifiButton.setAttribute("aria-pressed", String(sceneState.sameWifi));
+  sceneTransferButton.setAttribute("aria-pressed", String(sceneState.fileTransferOpen));
+  sceneWifiButton.classList.toggle("is-needed", missing.includes("wifi"));
+  sceneTransferButton.classList.toggle("is-needed", missing.includes("transfer"));
+}
+
+function setSceneCondition(key, value) {
+  sceneState[key] = value;
+  updateSceneConditionButtons();
+}
+
+function getMissingSceneConditions() {
+  const missing = [];
+  if (!sceneState.sameWifi) missing.push("wifi");
+  if (!sceneState.fileTransferOpen) missing.push("transfer");
+  return missing;
+}
+
 function startSceneDevice() {
   if (!isHomeViewActive()) {
     showToast("请先回到首页");
+    return;
+  }
+  const missing = getMissingSceneConditions();
+  if (missing.length) {
+    updateSceneConditionButtons(missing);
+    const labels = missing.map((item) => (item === "wifi" ? "同一 WiFi" : "文件传输界面"));
+    showToast(`请先完成：${labels.join("、")}`);
     return;
   }
   const deviceName = ensureSimulatedDevice("Darwin's Onyx epaper");
@@ -504,6 +536,8 @@ function startSceneDevice() {
 }
 
 function stopSceneDevice() {
+  setSceneCondition("sameWifi", false);
+  setSceneCondition("fileTransferOpen", false);
   if (connectButton.classList.contains("is-connected")) {
     closeConnectionSheet();
     setDeviceConnection(false);
@@ -1074,11 +1108,20 @@ document.querySelectorAll(".file-delete-button").forEach((button) => {
 });
 
 syncDeviceState();
+updateSceneConditionButtons();
 
 sheetScrim.addEventListener("click", closeDeviceSheet);
 connectionCloseButton.addEventListener("click", closeConnectionSheet);
 reconnectButton.addEventListener("click", startDeviceConnection);
 connectionDoneButton.addEventListener("click", closeConnectionSheet);
+sceneWifiButton.addEventListener("click", () => {
+  setSceneCondition("sameWifi", !sceneState.sameWifi);
+  showToast(sceneState.sameWifi ? "墨水屏已连接同一 WiFi" : "墨水屏已断开 WiFi");
+});
+sceneTransferButton.addEventListener("click", () => {
+  setSceneCondition("fileTransferOpen", !sceneState.fileTransferOpen);
+  showToast(sceneState.fileTransferOpen ? "已打开文件传输界面" : "已退出文件传输界面");
+});
 sceneStartButton.addEventListener("click", startSceneDevice);
 sceneStopButton.addEventListener("click", stopSceneDevice);
 scanBackButton.addEventListener("click", closeDeviceSheet);

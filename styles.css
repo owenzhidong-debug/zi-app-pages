@@ -92,9 +92,60 @@ svg {
   top: 18px;
   left: calc(100% + 14px);
   z-index: 30;
-  width: 112px;
+  width: 124px;
   display: grid;
   gap: 10px;
+}
+
+.scene-condition-group {
+  display: grid;
+  gap: 7px;
+  padding: 8px;
+  border: 1px solid rgba(216, 221, 227, 0.95);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 10px 24px rgba(20, 26, 34, 0.08);
+  backdrop-filter: blur(14px);
+}
+
+.scene-condition {
+  min-height: 36px;
+  padding: 0 8px;
+  display: grid;
+  grid-template-columns: 10px 1fr;
+  align-items: center;
+  gap: 7px;
+  border-radius: 10px;
+  background: #f7f8fa;
+  color: #59636f;
+  text-align: left;
+  font-size: 12px;
+  line-height: 1.15;
+  font-weight: 760;
+  transition:
+    background 180ms ease,
+    color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.scene-condition[aria-pressed="true"] {
+  background: #ecfdf3;
+  color: #166534;
+}
+
+.scene-condition.is-needed {
+  box-shadow: inset 0 0 0 1px #f59e0b;
+}
+
+.scene-condition-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #c4c9d0;
+}
+
+.scene-condition[aria-pressed="true"] .scene-condition-dot {
+  background: #16a34a;
 }
 
 .scene-button {
@@ -6479,7 +6530,20 @@ svg {
     top: 10px;
     left: auto;
     right: 10px;
-    width: 96px;
+    width: 104px;
+    gap: 8px;
+  }
+
+  .scene-condition-group {
+    gap: 6px;
+    padding: 7px;
+    border-radius: 14px;
+  }
+
+  .scene-condition {
+    min-height: 34px;
+    padding: 0 7px;
+    font-size: 11px;
   }
 
   .scene-button {
