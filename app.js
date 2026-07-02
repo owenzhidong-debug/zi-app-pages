@@ -28,6 +28,7 @@ const connectionSheet = document.getElementById("connectionSheet");
 const connectionCloseButton = document.getElementById("connectionCloseButton");
 const connectionDeviceTitle = document.getElementById("connectionDeviceTitle");
 const connectionSuccessDevice = document.getElementById("connectionSuccessDevice");
+const connectionStepItems = document.querySelectorAll("[data-connection-step]");
 const reconnectButton = document.getElementById("reconnectButton");
 const connectionDoneButton = document.getElementById("connectionDoneButton");
 const bindSheet = document.getElementById("bindSheet");
@@ -458,6 +459,7 @@ function openConnectionSheet() {
   connectionDeviceTitle.textContent = activeProfileDevice;
   connectionSuccessDevice.textContent = activeProfileDevice;
   connectionSheet.classList.remove("is-connecting", "is-success");
+  updateConnectionCheckPanel();
   connectionSheet.hidden = false;
   sheetScrim.hidden = false;
   phone.classList.remove("scan-bind-mode");
@@ -472,6 +474,13 @@ function closeConnectionSheet() {
 
 function startDeviceConnection() {
   if (!activeProfileDevice) return;
+  const missing = getMissingSceneConditions();
+  if (missing.length) {
+    updateConnectionCheckPanel();
+    updateSceneConditionButtons(missing);
+    showToast(`请先完成：${getSceneConditionLabels(missing).join("、")}`);
+    return;
+  }
   connectionDeviceTitle.textContent = activeProfileDevice;
   connectionSuccessDevice.textContent = activeProfileDevice;
   connectionSheet.classList.remove("is-success");
@@ -519,6 +528,7 @@ function setSceneCondition(key, value) {
     sceneState.appSameWifi = false;
   }
   updateSceneConditionButtons();
+  updateConnectionCheckPanel();
   maybeStartSceneDevice();
 }
 
@@ -528,6 +538,35 @@ function getMissingSceneConditions() {
   if (!sceneState.appSameWifi) missing.push("sameWifi");
   if (!sceneState.fileTransferOpen) missing.push("transfer");
   return missing;
+}
+
+function getSceneConditionLabels(items) {
+  return items.map((item) => {
+    if (item === "wifi") return "连接 WiFi";
+    if (item === "sameWifi") return "同一 WiFi";
+    return "文件传输界面";
+  });
+}
+
+function updateConnectionCheckPanel() {
+  const stepState = {
+    wifi: sceneState.wifiConnected,
+    sameWifi: sceneState.appSameWifi,
+    transfer: sceneState.fileTransferOpen,
+  };
+
+  connectionStepItems.forEach((item) => {
+    const complete = Boolean(stepState[item.dataset.connectionStep]);
+    const marker = item.querySelector("[data-step-index]");
+    item.classList.toggle("done", complete);
+    item.setAttribute("aria-checked", String(complete));
+    if (!marker) return;
+    if (complete) {
+      marker.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 12 4 4 8-8" /></svg>';
+      return;
+    }
+    marker.textContent = marker.dataset.stepIndex;
+  });
 }
 
 function startSceneDevice() {
@@ -540,12 +579,7 @@ function startSceneDevice() {
   const missing = getMissingSceneConditions();
   if (missing.length) {
     updateSceneConditionButtons(missing);
-    const labels = missing.map((item) => {
-      if (item === "wifi") return "连接 WiFi";
-      if (item === "sameWifi") return "同一 WiFi";
-      return "文件传输界面";
-    });
-    showToast(`请先完成：${labels.join("、")}`);
+    showToast(`请先完成：${getSceneConditionLabels(missing).join("、")}`);
     return;
   }
   connectSceneDevice();
@@ -1141,6 +1175,7 @@ document.querySelectorAll(".file-delete-button").forEach((button) => {
 
 syncDeviceState();
 updateSceneConditionButtons();
+updateConnectionCheckPanel();
 
 sheetScrim.addEventListener("click", closeDeviceSheet);
 connectionCloseButton.addEventListener("click", closeConnectionSheet);
