@@ -1076,6 +1076,44 @@
           </section>
         </section>
 
+        <section class="transfer-record-view" id="transferRecordView" aria-label="传输记录">
+          <header class="manager-header transfer-record-header">
+            <button class="manager-back" type="button" id="transferRecordBackButton" aria-label="返回首页">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m15 18-6-6 6-6" />
+              </svg>
+            </button>
+            <div>
+              <h1>传输记录</h1>
+            </div>
+          </header>
+
+          <div class="transfer-retention">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 7v5l3 2" />
+            </svg>
+            <span>仅保留最近 30 天传输记录</span>
+          </div>
+
+          <div class="transfer-filter-row" aria-label="传输记录筛选">
+            <button type="button" id="transferStatusFilterButton">
+              <span>全部状态</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
+            <button type="button" id="transferMethodFilterButton">
+              <span>全部方式</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="transfer-record-list" id="transferRecordList"></div>
+        </section>
+
         <div class="sheet-scrim" id="sheetScrim" hidden></div>
         <section class="device-sheet" id="deviceSheet" aria-label="设备操作" hidden>
           <div class="sheet-handle"></div>
@@ -1134,17 +1172,6 @@
               </svg>
             </button>
           </div>
-        </section>
-
-        <section class="transfer-detail-sheet" id="transferDetailSheet" aria-label="传输进度" hidden>
-          <button class="transfer-detail-close" type="button" id="transferDetailCloseButton" aria-label="关闭传输进度">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="m6 6 12 12" />
-              <path d="m18 6-12 12" />
-            </svg>
-          </button>
-          <h2>传输进度</h2>
-          <div class="transfer-detail-list" id="transferDetailList"></div>
         </section>
 
         <section class="connection-sheet" id="connectionSheet" aria-label="连接设备" hidden>
@@ -1301,6 +1328,18 @@
           </button>
         </nav>
       </section>
+
+      <aside class="transfer-scenario-controls" id="transferScenarioControls" aria-label="传输分支模拟">
+        <span class="scenario-title">传输分支</span>
+        <button type="button" data-transfer-scenario="lanActive">局域网传输中</button>
+        <button type="button" data-transfer-scenario="lanComplete">局域网完成</button>
+        <button type="button" data-transfer-scenario="lanFailed">局域网失败</button>
+        <button type="button" data-transfer-scenario="cloudUploading">云端上传中</button>
+        <button type="button" data-transfer-scenario="cloudPending">云端待接收</button>
+        <button type="button" data-transfer-scenario="cloudSent">云端已发送</button>
+        <button type="button" data-transfer-scenario="cloudFailed">云端失败</button>
+        <button type="button" data-transfer-scenario="unsupported">格式不支持</button>
+      </aside>
 
       <aside class="scene-controls" id="sceneControls" aria-label="场景模拟">
         <button class="scene-condition scene-condition-standalone" type="button" id="scenePhoneWifiButton" aria-pressed="false">

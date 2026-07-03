@@ -97,6 +97,56 @@ svg {
   gap: 10px;
 }
 
+.transfer-scenario-controls {
+  position: absolute;
+  top: 18px;
+  right: calc(100% + 14px);
+  z-index: 30;
+  width: 132px;
+  display: grid;
+  gap: 7px;
+  padding: 10px;
+  border: 1px solid rgba(216, 221, 227, 0.95);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 12px 28px rgba(20, 26, 34, 0.09);
+  backdrop-filter: blur(14px);
+}
+
+.scenario-title {
+  padding: 2px 2px 4px;
+  color: #7b838d;
+  font-size: 12px;
+  line-height: 1.1;
+  font-weight: 850;
+}
+
+.transfer-scenario-controls button {
+  min-height: 33px;
+  padding: 0 10px;
+  border: 1px solid #e2e6ec;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #3d4652;
+  text-align: left;
+  font-size: 12px;
+  line-height: 1.1;
+  font-weight: 780;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.transfer-scenario-controls button:hover,
+.transfer-scenario-controls button.is-active {
+  border-color: #b8c4d0;
+  background: #f7f9fb;
+  color: #151515;
+  box-shadow: inset 0 0 0 1px rgba(184, 196, 208, 0.45);
+}
+
 .scene-condition-group {
   display: grid;
   gap: 7px;
@@ -603,7 +653,8 @@ svg {
 .phone.no-bound-devices .device-row,
 .phone.no-bound-devices .last-sync,
 .phone.no-bound-devices .device-menu,
-.phone.no-bound-devices .action-grid {
+.phone.no-bound-devices .action-grid,
+.phone.no-bound-devices .transfer-summary-card {
   display: none;
 }
 
@@ -847,6 +898,10 @@ svg {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
+.transfer-summary-card[hidden] {
+  display: none;
+}
+
 .transfer-summary-icon {
   width: 40px;
   height: 40px;
@@ -894,6 +949,31 @@ svg {
   font-size: 17px;
   line-height: 1;
   font-weight: 900;
+}
+
+.transfer-summary-card.is-failed {
+  border-color: #f3caca;
+  background: #fff7f7;
+}
+
+.transfer-summary-card.is-failed .transfer-summary-icon,
+.transfer-summary-card.is-failed .transfer-summary-percent {
+  color: #e54848;
+}
+
+.transfer-summary-card.is-pending {
+  border-color: #dce2ea;
+  background: #f8fafc;
+}
+
+.transfer-summary-card.is-pending .transfer-summary-icon,
+.transfer-summary-card.is-pending .transfer-summary-percent {
+  color: #64748b;
+}
+
+.transfer-summary-card.is-complete {
+  border-color: #dce7df;
+  background: #f7fbf8;
 }
 
 .transfer-detail-sheet {
@@ -1026,6 +1106,142 @@ svg {
   color: #8a8f98;
 }
 
+.transfer-row.is-failed .transfer-status,
+.transfer-row.is-failed .transfer-progress {
+  color: #f05252;
+}
+
+.transfer-row.is-pending .transfer-status {
+  color: #64748b;
+}
+
+.transfer-chip.is-cloud {
+  border-color: #b9d8ff;
+  background: #eff6ff;
+  color: #2f7cf6;
+}
+
+.transfer-retry-button {
+  color: #2f7cf6;
+  font-size: 14px;
+  line-height: 1;
+  font-weight: 820;
+}
+
+.transfer-record-view {
+  display: none;
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: #ffffff;
+}
+
+.transfer-record-view::-webkit-scrollbar {
+  display: none;
+}
+
+.transfer-record-header {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  min-height: 58px;
+  padding: 0 18px;
+  display: grid;
+  grid-template-columns: 42px 1fr 42px;
+  align-items: center;
+  border-bottom: 1px solid #eef0f2;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(16px);
+}
+
+.transfer-record-header h1 {
+  margin: 0;
+  text-align: center;
+  color: #151515;
+  font-size: 20px;
+  line-height: 1.2;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.transfer-retention {
+  min-height: 58px;
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border-bottom: 1px solid #eef0f2;
+  background: #f7f8fa;
+  color: #8a8f98;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.transfer-retention svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.1;
+}
+
+.transfer-filter-row {
+  padding: 16px 18px;
+  display: flex;
+  gap: 12px;
+  border-bottom: 1px solid #eef0f2;
+  background: #ffffff;
+}
+
+.transfer-filter-row button {
+  min-width: 112px;
+  min-height: 44px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid #e2e6ec;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #4b5563;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.transfer-filter-row svg {
+  width: 17px;
+  height: 17px;
+  stroke-width: 2.3;
+}
+
+.transfer-record-list {
+  padding: 0 18px 34px;
+}
+
+.transfer-record-group {
+  padding-top: 18px;
+}
+
+.transfer-record-group h2 {
+  margin: 0 0 12px;
+  color: #858b94;
+  font-size: 16px;
+  line-height: 1.2;
+  font-weight: 850;
+}
+
+.transfer-record-group-list {
+  display: grid;
+  gap: 12px;
+}
+
+.transfer-record-view .transfer-row {
+  min-height: 92px;
+  padding: 14px;
+  border: 1px solid #e6e9ee;
+  border-radius: 16px;
+  background: #ffffff;
+}
+
 .bookstore-view {
   display: none;
   height: calc(100% - 96px);
@@ -1116,6 +1332,24 @@ svg {
 }
 
 .phone.file-manager-mode .file-manager-view {
+  display: block;
+}
+
+.phone.transfer-record-mode .hero,
+.phone.transfer-record-mode .home-panel,
+.phone.transfer-record-mode .bookstore-view,
+.phone.transfer-record-mode .gallery-view,
+.phone.transfer-record-mode .apps-view,
+.phone.transfer-record-mode .profile-view,
+.phone.transfer-record-mode .file-manager-view,
+.phone.transfer-record-mode .todo-view,
+.phone.transfer-record-mode .countdown-view,
+.phone.transfer-record-mode .utility-app-view,
+.phone.transfer-record-mode .tabbar {
+  display: none;
+}
+
+.phone.transfer-record-mode .transfer-record-view {
   display: block;
 }
 
@@ -6854,6 +7088,21 @@ svg {
 }
 
 @media (max-width: 620px) {
+  .transfer-scenario-controls {
+    top: 10px;
+    left: 10px;
+    right: auto;
+    width: 108px;
+    gap: 6px;
+    padding: 8px;
+  }
+
+  .transfer-scenario-controls button {
+    min-height: 30px;
+    padding: 0 8px;
+    font-size: 11px;
+  }
+
   .scene-controls {
     top: 10px;
     left: auto;

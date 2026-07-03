@@ -13,9 +13,11 @@ const transferSummaryCard = document.getElementById("transferSummaryCard");
 const transferSummaryTitle = document.getElementById("transferSummaryTitle");
 const transferSummaryMeta = document.getElementById("transferSummaryMeta");
 const transferSummaryPercent = document.getElementById("transferSummaryPercent");
-const transferDetailSheet = document.getElementById("transferDetailSheet");
-const transferDetailCloseButton = document.getElementById("transferDetailCloseButton");
-const transferDetailList = document.getElementById("transferDetailList");
+const transferRecordView = document.getElementById("transferRecordView");
+const transferRecordBackButton = document.getElementById("transferRecordBackButton");
+const transferRecordList = document.getElementById("transferRecordList");
+const transferStatusFilterButton = document.getElementById("transferStatusFilterButton");
+const transferMethodFilterButton = document.getElementById("transferMethodFilterButton");
 const deviceMenuButton = document.getElementById("deviceMenuButton");
 const deviceMenu = document.getElementById("deviceMenu");
 const phone = document.querySelector(".phone");
@@ -63,6 +65,7 @@ const sceneSameWifiButton = document.getElementById("sceneSameWifiButton");
 const sceneTransferButton = document.getElementById("sceneTransferButton");
 const sceneStartButton = document.getElementById("sceneStartButton");
 const sceneStopButton = document.getElementById("sceneStopButton");
+const transferScenarioButtons = document.querySelectorAll("[data-transfer-scenario]");
 const todoBackButton = document.getElementById("todoBackButton");
 const todoAddButton = document.getElementById("todoAddButton");
 const todoList = document.getElementById("todoList");
@@ -113,6 +116,10 @@ let editingTodoCard = null;
 let editingCountdownCard = null;
 const transferTasks = [];
 let hasTransferActivityThisSession = false;
+const TRANSFER_DURATION_MS = 82 * 1000;
+const activeTransferStatuses = new Set(["传输中", "云端上传中"]);
+const failedTransferStatuses = new Set(["传输失败", "WiFi 已变化", "设备已断开", "云端失败", "格式不支持"]);
+const pendingTransferStatuses = new Set(["等待传输", "待设备接收"]);
 const sceneState = {
   phoneWifiConnected: false,
   einkWifiConnected: false,
@@ -125,6 +132,7 @@ const fallbackUser = {
   email: "darwin@example.com",
 };
 const utilityModes = ["pet-mode", "words-mode", "stocks-mode", "template-mode"];
+const pageModes = ["cover-editor-mode", "file-manager-mode", "todo-mode", "countdown-mode", "transfer-record-mode", ...utilityModes];
 let activeProfileDevice = "";
 let activeWordBook = null;
 let wordsScreen = "books";
@@ -256,88 +264,303 @@ function getTransferTimeLabel() {
   return `今天 ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
 }
 
-function renderTransferDetailList() {
-  transferDetailList.innerHTML = transferTasks.map((task) => `
-    <article class="transfer-row${task.progress >= 100 ? " is-complete" : ""}">
+function inferTransferType(name) {
+  if (/\.(ttf|otf)$/i.test(name)) return "font";
+  if (/\.(png|jpe?g|webp)$/i.test(name)) return "image";
+  return "document";
+}
+
+function isActiveTransfer(task) {
+  return activeTransferStatuses.has(task.status);
+}
+
+function getTransferRecords() {
+  return transferTasks.map((task) => ({
+    id: task.id,
+    name: task.name,
+    sizeLabel: task.sizeLabel,
+    timeLabel: task.timeLabel,
+    status: task.status,
+    method: task.method,
+    progress: task.progress,
+    day: "今天",
+    type: task.type,
+  }));
+}
+
+function getTransferIconPath(type) {
+  if (type === "image") {
+    return '<rect x="4" y="4" width="16" height="16" rx="2" /><circle cx="9" cy="9" r="1.8" /><path d="m5 18 5.5-5.5L14 16l2-2 3 4" />';
+  }
+  if (type === "font") {
+    return '<path d="M5 5h14" /><path d="M12 5v14" /><path d="M8 19h8" />';
+  }
+  return '<path d="M7 3h7l4 4v14H7z" /><path d="M14 3v5h5" /><path d="M10 12h5" /><path d="M10 16h7" />';
+}
+
+function renderTransferRecordList() {
+  const groups = ["今天", "昨天", "更早"];
+  const records = getTransferRecords();
+  transferRecordList.innerHTML = groups.map((group) => {
+    const groupRecords = records.filter((record) => record.day === group);
+    if (!groupRecords.length) return "";
+    return `
+      <section class="transfer-record-group">
+        <h2>${group}</h2>
+        <div class="transfer-record-group-list">
+          ${groupRecords.map((record) => `
+            <article class="transfer-row${record.status === "已完成" || record.status === "已发送到设备" ? " is-complete" : ""}${failedTransferStatuses.has(record.status) ? " is-failed" : ""}${pendingTransferStatuses.has(record.status) ? " is-pending" : ""}">
       <span class="transfer-file-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24">
-          <path d="M7 3h7l4 4v14H7z" />
-          <path d="M14 3v5h5" />
-          <path d="M10 12h5" />
-          <path d="M10 16h7" />
+                    ${getTransferIconPath(record.type)}
         </svg>
       </span>
       <span class="transfer-info">
-        <strong>${escapeHTML(task.name)}</strong>
-        <small><span class="transfer-status">${task.progress >= 100 ? "已完成" : "传输中"}</span> · ${task.timeLabel} · ${task.sizeLabel}</small>
+                <strong>${escapeHTML(record.name)}</strong>
+                <small><span class="transfer-status">${record.status}</span> · ${record.timeLabel} · ${record.sizeLabel}</small>
       </span>
       <span class="transfer-side">
-        <span class="transfer-chip">局域网</span>
-        <span class="transfer-progress">${task.progress >= 100 ? "完成" : `${task.progress}%`}</span>
+                <span class="transfer-chip${record.method === "云端" ? " is-cloud" : ""}">${record.method}</span>
+                ${activeTransferStatuses.has(record.status) ? `<span class="transfer-progress">${record.progress}%</span>` : ""}
+                ${failedTransferStatuses.has(record.status) ? `<button class="transfer-retry-button" type="button" data-transfer-retry="${record.id}">重试</button>` : ""}
       </span>
     </article>
-  `).join("");
+          `).join("")}
+        </div>
+      </section>
+    `;
+  }).join("");
 }
 
 function updateTransferSummary() {
   if (!getBoundDeviceRows().length || !hasTransferActivityThisSession) {
     transferSummaryCard.hidden = true;
+    transferSummaryCard.classList.remove("is-failed", "is-pending", "is-complete");
     return;
   }
 
-  const activeTasks = transferTasks.filter((task) => task.progress < 100);
+  const activeTasks = transferTasks.filter(isActiveTransfer);
+  const queuedTasks = transferTasks.filter((task) => task.status === "等待传输");
+  const failedTasks = transferTasks.filter((task) => failedTransferStatuses.has(task.status));
+  const pendingTasks = transferTasks.filter((task) => task.status === "待设备接收");
+  const completedTasks = transferTasks.filter((task) => task.status === "已完成" || task.status === "已发送到设备");
   transferSummaryCard.hidden = false;
+  transferSummaryCard.classList.remove("is-failed", "is-pending", "is-complete");
 
-  if (!activeTasks.length) {
-    const completedCount = transferTasks.filter((task) => task.progress >= 100).length;
-    transferSummaryTitle.textContent = `${completedCount} 个文件已完成`;
-    transferSummaryMeta.textContent = transferTasks[0]?.name || "本次传输已完成";
-    transferSummaryPercent.textContent = "完成";
+  if (activeTasks.length) {
+    const averageProgress = Math.round(activeTasks.reduce((sum, task) => sum + task.progress, 0) / activeTasks.length);
+    transferSummaryTitle.textContent = `${activeTasks.length} 个文件传输中`;
+    transferSummaryMeta.textContent = queuedTasks.length ? `${activeTasks[0].name} · ${queuedTasks.length} 个等待` : activeTasks[0].name;
+    transferSummaryPercent.textContent = `${averageProgress}%`;
     return;
   }
 
-  const averageProgress = Math.round(activeTasks.reduce((sum, task) => sum + task.progress, 0) / activeTasks.length);
-  transferSummaryTitle.textContent = `${activeTasks.length} 个文件传输中`;
-  transferSummaryMeta.textContent = activeTasks.length === 1 ? activeTasks[0].name : `${transferTasks.length} 个传输任务`;
-  transferSummaryPercent.textContent = `${averageProgress}%`;
+  if (failedTasks.length) {
+    transferSummaryCard.classList.add("is-failed");
+    transferSummaryTitle.textContent = `${failedTasks.length} 个文件传输失败`;
+    transferSummaryMeta.textContent = failedTasks[0].name;
+    transferSummaryPercent.textContent = "重试";
+    return;
+  }
+
+  if (pendingTasks.length) {
+    transferSummaryCard.classList.add("is-pending");
+    transferSummaryTitle.textContent = `${pendingTasks.length} 个文件待接收`;
+    transferSummaryMeta.textContent = pendingTasks[0].name;
+    transferSummaryPercent.textContent = "待接收";
+    return;
+  }
+
+  transferSummaryCard.classList.add("is-complete");
+  transferSummaryTitle.textContent = `${completedTasks.length} 个文件已完成`;
+  transferSummaryMeta.textContent = transferTasks[0]?.name || "本次传输已完成";
+  transferSummaryPercent.textContent = "完成";
 }
 
 function renderTransferViews() {
   updateTransferSummary();
-  renderTransferDetailList();
+  renderTransferRecordList();
 }
 
-function createTransferTask(file) {
+function createTransferTask(file, status = "等待传输") {
   hasTransferActivityThisSession = true;
   const task = {
     id: Date.now() + Math.random(),
     name: file.name,
     sizeLabel: formatFileSize(file.size),
     timeLabel: getTransferTimeLabel(),
+    status,
+    method: "局域网",
     progress: 0,
+    type: inferTransferType(file.name),
+    timer: null,
   };
-  transferTasks.unshift(task);
-  transferTasks.splice(8);
+  transferTasks.push(task);
   renderTransferViews();
   return task;
 }
 
 function updateTransferTask(task, progress) {
   task.progress = Math.min(100, progress);
+  if (task.progress >= 100) {
+    task.status = task.method === "云端" ? "已发送到设备" : "已完成";
+  }
   renderTransferViews();
 }
 
-function startBookTransfer(file) {
-  const task = createTransferTask(file);
-  let progress = 0;
-  const timer = setInterval(() => {
-    progress += Math.floor(Math.random() * 14) + 10;
+function stopTaskTimer(task) {
+  if (!task?.timer) return;
+  clearInterval(task.timer);
+  task.timer = null;
+}
+
+function runTransferTimer(task) {
+  stopTaskTimer(task);
+  const startProgress = Number.isFinite(task.progress) ? task.progress : 0;
+  const startedAt = Date.now();
+  task.timer = setInterval(() => {
+    const progress = Math.round(startProgress + ((Date.now() - startedAt) / TRANSFER_DURATION_MS) * 100);
     updateTransferTask(task, progress);
-    if (progress >= 100) {
-      clearInterval(timer);
+    if (task.progress >= 100) {
+      stopTaskTimer(task);
       showToast("图书已导入墨水屏");
+      startNextTransferTask();
     }
-  }, 520);
+  }, 1000);
+  renderTransferViews();
+}
+
+function startQueuedTransferTask(task) {
+  task.status = "传输中";
+  task.progress = 0;
+  task.timeLabel = getTransferTimeLabel();
+  runTransferTimer(task);
+}
+
+function startNextTransferTask() {
+  if (transferTasks.some(isActiveTransfer)) return;
+  const nextTask = transferTasks.find((task) => task.status === "等待传输");
+  if (!nextTask) return;
+  startQueuedTransferTask(nextTask);
+}
+
+function startBookTransfer(file) {
+  createTransferTask(file);
+  startNextTransferTask();
+}
+
+function retryTransferTask(taskId) {
+  const task = transferTasks.find((item) => String(item.id) === String(taskId));
+  if (!task || !failedTransferStatuses.has(task.status)) return;
+  stopTaskTimer(task);
+  task.status = "等待传输";
+  task.progress = 0;
+  task.timeLabel = getTransferTimeLabel();
+  if (task.method === "本地") task.method = "局域网";
+  renderTransferViews();
+  startNextTransferTask();
+  showToast(`${task.name} 已重新加入队列`);
+}
+
+const transferScenarioMap = {
+  lanActive: {
+    label: "局域网传输中",
+    status: "传输中",
+    method: "局域网",
+  },
+  lanComplete: {
+    label: "局域网完成",
+    status: "已完成",
+    method: "局域网",
+    progress: 100,
+    terminal: true,
+  },
+  lanFailed: {
+    label: "局域网失败",
+    status: "传输失败",
+    method: "局域网",
+    terminal: true,
+  },
+  cloudUploading: {
+    label: "云端上传中",
+    status: "云端上传中",
+    method: "云端",
+  },
+  cloudPending: {
+    label: "云端待接收",
+    status: "待设备接收",
+    method: "云端",
+    progress: null,
+    terminal: true,
+  },
+  cloudSent: {
+    label: "云端已发送",
+    status: "已发送到设备",
+    method: "云端",
+    progress: 100,
+    terminal: true,
+  },
+  cloudFailed: {
+    label: "云端失败",
+    status: "云端失败",
+    method: "云端",
+    terminal: true,
+  },
+  unsupported: {
+    label: "格式不支持",
+    status: "格式不支持",
+    method: "本地",
+    progress: null,
+    terminal: true,
+  },
+};
+
+function getCurrentTransferTask() {
+  return transferTasks.find(isActiveTransfer) || transferTasks.find((task) => task.status === "等待传输");
+}
+
+function applyTransferScenario(key) {
+  const scenario = transferScenarioMap[key];
+  if (!scenario) return;
+  const currentTask = getCurrentTransferTask();
+  if (!currentTask) {
+    showToast("请先上传文件");
+    return;
+  }
+
+  currentTask.status = scenario.status;
+  currentTask.method = scenario.method;
+  if (Number.isFinite(scenario.progress)) {
+    currentTask.progress = scenario.progress;
+  } else if (scenario.status === "传输中" || scenario.status === "云端上传中") {
+    currentTask.progress = Math.max(1, currentTask.progress || 1);
+  }
+  currentTask.timeLabel = getTransferTimeLabel();
+  hasTransferActivityThisSession = true;
+
+  const deviceName = ensureSimulatedDevice("Darwin's Onyx epaper");
+  activateHomeView(deviceName);
+  setDeviceConnection(true);
+  if (scenario.method !== "本地") {
+    sceneState.phoneWifiConnected = true;
+    sceneState.einkWifiConnected = true;
+    sceneState.appSameWifi = true;
+    sceneState.fileTransferOpen = true;
+    updateSceneConditionButtons();
+    updateConnectionCheckPanel();
+  }
+
+  transferScenarioButtons.forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.transferScenario === key);
+  });
+  renderTransferViews();
+  if (scenario.terminal) {
+    stopTaskTimer(currentTask);
+    startNextTransferTask();
+  } else {
+    runTransferTimer(currentTask);
+  }
+  showToast(`${currentTask.name}：${scenario.label}`);
 }
 
 function setProfileUser(user) {
@@ -461,7 +684,7 @@ document.querySelectorAll(".tab-item").forEach((tab) => {
     phone.classList.toggle("gallery-mode", label === "图库");
     phone.classList.toggle("apps-mode", label === "应用");
     phone.classList.toggle("profile-mode", label === "个人中心");
-    phone.classList.remove("cover-editor-mode", "file-manager-mode", "todo-mode", "countdown-mode", ...utilityModes);
+    phone.classList.remove(...pageModes);
     if (label === "首页") {
       syncDeviceState();
     }
@@ -509,7 +732,7 @@ document.querySelectorAll("[data-template]").forEach((template) => {
   template.addEventListener("click", () => {
     if (template.dataset.template === "透明书封") {
       phone.classList.add("cover-editor-mode");
-      phone.classList.remove("gallery-mode", "bookstore-mode", "apps-mode", "todo-mode", "countdown-mode", ...utilityModes);
+      phone.classList.remove("gallery-mode", "bookstore-mode", "apps-mode", ...pageModes.filter((mode) => mode !== "cover-editor-mode"));
       showToast("打开透明书封");
       return;
     }
@@ -535,7 +758,6 @@ function openDeviceSheet(deviceName) {
   bindSheet.hidden = true;
   connectionSheet.hidden = true;
   importTransferSheet.hidden = true;
-  transferDetailSheet.hidden = true;
   phone.classList.remove("scan-bind-mode");
   sheetDeviceName.textContent = deviceName;
   sheetScrim.hidden = false;
@@ -546,7 +768,6 @@ function openBindSheet() {
   deviceSheet.hidden = true;
   connectionSheet.hidden = true;
   importTransferSheet.hidden = true;
-  transferDetailSheet.hidden = true;
   sheetScrim.hidden = true;
   bindSheet.hidden = false;
   phone.classList.add("scan-bind-mode");
@@ -586,7 +807,6 @@ function openConnectionSheet() {
   bindSheet.hidden = true;
   deviceSheet.hidden = true;
   importTransferSheet.hidden = true;
-  transferDetailSheet.hidden = true;
   connectionDeviceTitle.textContent = activeProfileDevice;
   connectionSuccessDevice.textContent = activeProfileDevice;
   connectionSheet.classList.remove("is-connecting", "is-success");
@@ -613,7 +833,6 @@ function openImportTransferSheet() {
   bindSheet.hidden = true;
   deviceSheet.hidden = true;
   connectionSheet.hidden = true;
-  transferDetailSheet.hidden = true;
   connectionSheet.classList.remove("is-connecting", "is-success");
   importTransferSheet.hidden = false;
   sheetScrim.hidden = false;
@@ -625,22 +844,19 @@ function closeImportTransferSheet() {
   sheetScrim.hidden = true;
 }
 
-function openTransferDetailSheet() {
-  if (!transferTasks.length) return;
-  clearTimeout(connectionTimer);
-  bindSheet.hidden = true;
-  deviceSheet.hidden = true;
-  connectionSheet.hidden = true;
-  importTransferSheet.hidden = true;
-  transferDetailSheet.hidden = false;
-  sheetScrim.hidden = false;
-  phone.classList.remove("scan-bind-mode");
-  renderTransferDetailList();
+function openTransferRecordView() {
+  closeDeviceSheet();
+  phone.classList.add("transfer-record-mode");
+  phone.classList.remove("bookstore-mode", "gallery-mode", "apps-mode", "profile-mode", "scan-bind-mode", ...pageModes.filter((mode) => mode !== "transfer-record-mode"));
+  document.querySelectorAll(".tab-item").forEach((item) => {
+    item.classList.toggle("active", item.dataset.tab === "首页");
+  });
+  renderTransferRecordList();
 }
 
-function closeTransferDetailSheet() {
-  transferDetailSheet.hidden = true;
-  sheetScrim.hidden = true;
+function closeTransferRecordView() {
+  phone.classList.remove("transfer-record-mode");
+  activateHomeView();
 }
 
 function startDeviceConnection() {
@@ -676,6 +892,7 @@ function isHomeViewActive() {
     "file-manager-mode",
     "todo-mode",
     "countdown-mode",
+    "transfer-record-mode",
     "scan-bind-mode",
     ...utilityModes,
   ];
@@ -828,14 +1045,13 @@ function closeDeviceSheet() {
   connectionSheet.hidden = true;
   connectionSheet.classList.remove("is-connecting", "is-success");
   importTransferSheet.hidden = true;
-  transferDetailSheet.hidden = true;
   bindSheet.hidden = true;
   phone.classList.remove("scan-bind-mode");
   syncDeviceState();
 }
 
 function activateHomeView(preferredDevice = activeProfileDevice) {
-  phone.classList.remove("bookstore-mode", "gallery-mode", "apps-mode", "profile-mode", "cover-editor-mode", "file-manager-mode", "todo-mode", "countdown-mode", "scan-bind-mode", ...utilityModes);
+  phone.classList.remove("bookstore-mode", "gallery-mode", "apps-mode", "profile-mode", "scan-bind-mode", ...pageModes);
   document.querySelectorAll(".tab-item").forEach((item) => {
     item.classList.toggle("active", item.dataset.tab === "首页");
   });
@@ -919,7 +1135,7 @@ function syncDeviceState(preferredDevice = activeProfileDevice) {
 
 function openCountdownView() {
   phone.classList.add("countdown-mode");
-  phone.classList.remove("apps-mode", "profile-mode", "bookstore-mode", "gallery-mode", "cover-editor-mode", "file-manager-mode", "todo-mode", ...utilityModes);
+  phone.classList.remove("apps-mode", "profile-mode", "bookstore-mode", "gallery-mode", ...pageModes.filter((mode) => mode !== "countdown-mode"));
   document.querySelectorAll(".tab-item").forEach((item) => {
     item.classList.toggle("active", item.dataset.tab === "应用");
   });
@@ -933,7 +1149,7 @@ function closeCountdownView() {
 
 function openTodoView() {
   phone.classList.add("todo-mode");
-  phone.classList.remove("apps-mode", "profile-mode", "bookstore-mode", "gallery-mode", "cover-editor-mode", "file-manager-mode", "countdown-mode", ...utilityModes);
+  phone.classList.remove("apps-mode", "profile-mode", "bookstore-mode", "gallery-mode", ...pageModes.filter((mode) => mode !== "todo-mode"));
   document.querySelectorAll(".tab-item").forEach((item) => {
     item.classList.toggle("active", item.dataset.tab === "应用");
   });
@@ -947,7 +1163,7 @@ function closeTodoView() {
 
 function openUtilityView(mode) {
   phone.classList.add(mode);
-  phone.classList.remove("apps-mode", "profile-mode", "bookstore-mode", "gallery-mode", "cover-editor-mode", "file-manager-mode", "todo-mode", "countdown-mode", ...utilityModes.filter((item) => item !== mode));
+  phone.classList.remove("apps-mode", "profile-mode", "bookstore-mode", "gallery-mode", ...pageModes.filter((item) => item !== mode));
   document.querySelectorAll(".tab-item").forEach((item) => {
     item.classList.toggle("active", item.dataset.tab === "应用");
   });
@@ -1193,7 +1409,11 @@ document.querySelectorAll("[data-profile-action]").forEach((action) => {
     }
     if (action.dataset.profileAction === "文件管理") {
       phone.classList.add("file-manager-mode");
-      phone.classList.remove("profile-mode", "bookstore-mode", "gallery-mode", "apps-mode", "cover-editor-mode", "todo-mode", "countdown-mode", ...utilityModes);
+      phone.classList.remove("profile-mode", "bookstore-mode", "gallery-mode", "apps-mode", ...pageModes.filter((mode) => mode !== "file-manager-mode"));
+      return;
+    }
+    if (action.dataset.profileAction === "文件传输列表") {
+      openTransferRecordView();
       return;
     }
     showToast(action.dataset.profileAction);
@@ -1412,8 +1632,18 @@ bookFileInput.addEventListener("change", () => {
   files.forEach(startBookTransfer);
   bookFileInput.value = "";
 });
-transferSummaryCard.addEventListener("click", openTransferDetailSheet);
-transferDetailCloseButton.addEventListener("click", closeTransferDetailSheet);
+transferSummaryCard.addEventListener("click", openTransferRecordView);
+transferRecordBackButton.addEventListener("click", closeTransferRecordView);
+transferRecordList.addEventListener("click", (event) => {
+  const retryButton = event.target.closest("[data-transfer-retry]");
+  if (!retryButton) return;
+  retryTransferTask(retryButton.dataset.transferRetry);
+});
+transferStatusFilterButton.addEventListener("click", () => showToast("全部状态"));
+transferMethodFilterButton.addEventListener("click", () => showToast("全部方式"));
+transferScenarioButtons.forEach((button) => {
+  button.addEventListener("click", () => applyTransferScenario(button.dataset.transferScenario));
+});
 scenePhoneWifiButton.addEventListener("click", () => {
   setSceneCondition("phoneWifiConnected", !sceneState.phoneWifiConnected);
   showToast(sceneState.phoneWifiConnected ? "手机已连接 WiFi" : "手机已断开 WiFi");
