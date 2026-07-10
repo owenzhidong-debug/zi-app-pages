@@ -448,6 +448,7 @@ function startNextTransferTask() {
   if (transferTasks.some(isActiveTransfer)) return;
   const nextTask = transferTasks.find((task) => task.status === "等待传输");
   if (!nextTask) return;
+  if (nextTask.method === "局域网" && !connectButton.classList.contains("is-connected")) return;
   startQueuedTransferTask(nextTask);
 }
 
@@ -483,6 +484,17 @@ function retryTransferTask(taskId) {
   renderTransferViews();
   startNextTransferTask();
   showToast(`${task.name} 已重新加入队列`);
+}
+
+function interruptActiveLanTransfers() {
+  const interruptedTasks = transferTasks.filter((task) => task.method === "局域网" && isActiveTransfer(task));
+  if (!interruptedTasks.length) return;
+  interruptedTasks.forEach((task) => {
+    stopTaskTimer(task);
+    task.status = "传输失败";
+    task.timeLabel = getTransferTimeLabel();
+  });
+  renderTransferViews();
 }
 
 const transferScenarioMap = {
@@ -800,10 +812,17 @@ function openBindSheet() {
 }
 
 function setDeviceConnection(connected) {
+  const wasConnected = connectButton.classList.contains("is-connected");
   connectButton.classList.toggle("is-connected", connected);
   connectButton.setAttribute("aria-pressed", String(connected));
   connectText.textContent = connected ? "已连接" : "未连接";
   lastSync.textContent = connected ? "上次连接：2 小时前" : "上次连接：2 天前";
+  if (wasConnected && !connected) {
+    interruptActiveLanTransfers();
+  }
+  if (!wasConnected && connected) {
+    startNextTransferTask();
+  }
 }
 
 function ensureSimulatedDevice(name = "Darwin's Onyx epaper") {
