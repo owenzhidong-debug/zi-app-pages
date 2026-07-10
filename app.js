@@ -9,7 +9,6 @@ const homeScanBindButton = document.getElementById("homeScanBindButton");
 const homeDeviceRow = document.getElementById("homeDeviceRow");
 const homeActionGrid = document.getElementById("homeActionGrid");
 const bookFileInput = document.getElementById("bookFileInput");
-const wallpaperFileInput = document.getElementById("wallpaperFileInput");
 const transferSummaryCard = document.getElementById("transferSummaryCard");
 const transferSummaryTitle = document.getElementById("transferSummaryTitle");
 const transferSummaryMeta = document.getElementById("transferSummaryMeta");
@@ -118,6 +117,7 @@ let editingTodoCard = null;
 let editingCountdownCard = null;
 const transferTasks = [];
 let hasTransferActivityThisSession = false;
+let pendingImportKind = "book";
 const TRANSFER_DURATION_MS = 82 * 1000;
 const activeTransferStatuses = new Set(["传输中", "云端上传中"]);
 const failedTransferStatuses = new Set(["传输失败", "WiFi 已变化", "设备已断开", "云端失败", "格式不支持"]);
@@ -461,6 +461,17 @@ function startWallpaperTransfer(file) {
   startNextTransferTask();
 }
 
+function openTransferFilePicker(kind) {
+  pendingImportKind = kind;
+  bookFileInput.value = "";
+  if (kind === "wallpaper") {
+    bookFileInput.accept = "image/*,.png,.jpg,.jpeg,.webp,.gif,.bmp,.heic,.heif";
+  } else {
+    bookFileInput.accept = ".epub,.txt,application/epub+zip,text/plain";
+  }
+  bookFileInput.click();
+}
+
 function retryTransferTask(taskId) {
   const task = transferTasks.find((item) => String(item.id) === String(taskId));
   if (!task || !failedTransferStatuses.has(task.status)) return;
@@ -679,13 +690,11 @@ document.querySelectorAll(".action-card").forEach((card) => {
       return;
     }
     if (action === "导入图书") {
-      bookFileInput.value = "";
-      bookFileInput.click();
+      openTransferFilePicker("book");
       return;
     }
     if (action === "导入壁纸") {
-      wallpaperFileInput.value = "";
-      wallpaperFileInput.click();
+      openTransferFilePicker("wallpaper");
       return;
     }
     showToast(action);
@@ -1640,8 +1649,21 @@ importCloudTransferButton.addEventListener("click", () => {
 bookFileInput.addEventListener("change", () => {
   const files = [...(bookFileInput.files || [])];
   if (!files.length) return;
-  const unsupported = files.find((file) => !isSupportedBookFile(file));
-  if (unsupported) {
+
+  if (pendingImportKind === "wallpaper") {
+    const unsupported = files.find((file) => !isSupportedWallpaperFile(file));
+    if (unsupported) {
+      showToast("仅支持图片文件");
+      bookFileInput.value = "";
+      return;
+    }
+    showToast(files.length > 1 ? `开始传输 ${files.length} 张图片` : "开始传输图片");
+    files.forEach(startWallpaperTransfer);
+    bookFileInput.value = "";
+    return;
+  }
+
+  if (files.find((file) => !isSupportedBookFile(file))) {
     showToast("仅支持 epub 或 txt 文件");
     bookFileInput.value = "";
     return;
@@ -1649,19 +1671,6 @@ bookFileInput.addEventListener("change", () => {
   showToast(files.length > 1 ? `开始传输 ${files.length} 个文件` : "开始传输图书");
   files.forEach(startBookTransfer);
   bookFileInput.value = "";
-});
-wallpaperFileInput.addEventListener("change", () => {
-  const files = [...(wallpaperFileInput.files || [])];
-  if (!files.length) return;
-  const unsupported = files.find((file) => !isSupportedWallpaperFile(file));
-  if (unsupported) {
-    showToast("仅支持图片文件");
-    wallpaperFileInput.value = "";
-    return;
-  }
-  showToast(files.length > 1 ? `开始传输 ${files.length} 张图片` : "开始传输图片");
-  files.forEach(startWallpaperTransfer);
-  wallpaperFileInput.value = "";
 });
 transferSummaryCard.addEventListener("click", openTransferRecordView);
 transferRecordBackButton.addEventListener("click", closeTransferRecordView);
