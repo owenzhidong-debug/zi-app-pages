@@ -9,6 +9,7 @@ const homeScanBindButton = document.getElementById("homeScanBindButton");
 const homeDeviceRow = document.getElementById("homeDeviceRow");
 const homeActionGrid = document.getElementById("homeActionGrid");
 const bookFileInput = document.getElementById("bookFileInput");
+const wallpaperFileInput = document.getElementById("wallpaperFileInput");
 const transferSummaryCard = document.getElementById("transferSummaryCard");
 const transferSummaryTitle = document.getElementById("transferSummaryTitle");
 const transferSummaryMeta = document.getElementById("transferSummaryMeta");
@@ -35,6 +36,7 @@ const deviceSheet = document.getElementById("deviceSheet");
 const sheetDeviceName = document.getElementById("sheetDeviceName");
 const addDeviceButton = document.getElementById("addDeviceButton");
 const importTransferSheet = document.getElementById("importTransferSheet");
+const importTransferTitle = document.getElementById("importTransferTitle");
 const importTransferCloseButton = document.getElementById("importTransferCloseButton");
 const importConnectDeviceButton = document.getElementById("importConnectDeviceButton");
 const importCloudTransferButton = document.getElementById("importCloudTransferButton");
@@ -259,6 +261,10 @@ function isSupportedBookFile(file) {
   return /\.(epub|txt)$/i.test(file.name);
 }
 
+function isSupportedWallpaperFile(file) {
+  return file.type.startsWith("image/") || /\.(png|jpe?g|webp|gif|bmp|heic|heif)$/i.test(file.name);
+}
+
 function getTransferTimeLabel() {
   const now = new Date();
   return `今天 ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
@@ -382,7 +388,7 @@ function renderTransferViews() {
   renderTransferRecordList();
 }
 
-function createTransferTask(file, status = "等待传输") {
+function createTransferTask(file, status = "等待传输", kind = "book") {
   hasTransferActivityThisSession = true;
   const task = {
     id: Date.now() + Math.random(),
@@ -392,7 +398,8 @@ function createTransferTask(file, status = "等待传输") {
     status,
     method: "局域网",
     progress: 0,
-    type: inferTransferType(file.name),
+    type: kind === "wallpaper" ? "image" : inferTransferType(file.name),
+    kind,
     timer: null,
   };
   transferTasks.push(task);
@@ -423,7 +430,7 @@ function runTransferTimer(task) {
     updateTransferTask(task, progress);
     if (task.progress >= 100) {
       stopTaskTimer(task);
-      showToast("图书已导入墨水屏");
+      showToast(task.kind === "wallpaper" ? "图片已导入墨水屏" : "图书已导入墨水屏");
       startNextTransferTask();
     }
   }, 1000);
@@ -445,7 +452,12 @@ function startNextTransferTask() {
 }
 
 function startBookTransfer(file) {
-  createTransferTask(file);
+  createTransferTask(file, "等待传输", "book");
+  startNextTransferTask();
+}
+
+function startWallpaperTransfer(file) {
+  createTransferTask(file, "等待传输", "wallpaper");
   startNextTransferTask();
 }
 
@@ -659,8 +671,8 @@ document.querySelectorAll(".action-card").forEach((card) => {
     card.classList.add("is-selected");
     const action = card.dataset.action;
     if (!connectButton.classList.contains("is-connected")) {
-      if (action === "导入图书") {
-        openImportTransferSheet();
+      if (action === "导入图书" || action === "导入壁纸") {
+        openImportTransferSheet(action);
         return;
       }
       openConnectionSheet();
@@ -669,6 +681,11 @@ document.querySelectorAll(".action-card").forEach((card) => {
     if (action === "导入图书") {
       bookFileInput.value = "";
       bookFileInput.click();
+      return;
+    }
+    if (action === "导入壁纸") {
+      wallpaperFileInput.value = "";
+      wallpaperFileInput.click();
       return;
     }
     showToast(action);
@@ -823,7 +840,7 @@ function closeConnectionSheet() {
   sheetScrim.hidden = true;
 }
 
-function openImportTransferSheet() {
+function openImportTransferSheet(action = "导入图书") {
   if (!getBoundDeviceRows().length) {
     openBindSheet();
     showToast("请先绑定设备");
@@ -834,6 +851,7 @@ function openImportTransferSheet() {
   deviceSheet.hidden = true;
   connectionSheet.hidden = true;
   connectionSheet.classList.remove("is-connecting", "is-success");
+  importTransferTitle.textContent = action;
   importTransferSheet.hidden = false;
   sheetScrim.hidden = false;
   phone.classList.remove("scan-bind-mode");
@@ -1631,6 +1649,19 @@ bookFileInput.addEventListener("change", () => {
   showToast(files.length > 1 ? `开始传输 ${files.length} 个文件` : "开始传输图书");
   files.forEach(startBookTransfer);
   bookFileInput.value = "";
+});
+wallpaperFileInput.addEventListener("change", () => {
+  const files = [...(wallpaperFileInput.files || [])];
+  if (!files.length) return;
+  const unsupported = files.find((file) => !isSupportedWallpaperFile(file));
+  if (unsupported) {
+    showToast("仅支持图片文件");
+    wallpaperFileInput.value = "";
+    return;
+  }
+  showToast(files.length > 1 ? `开始传输 ${files.length} 张图片` : "开始传输图片");
+  files.forEach(startWallpaperTransfer);
+  wallpaperFileInput.value = "";
 });
 transferSummaryCard.addEventListener("click", openTransferRecordView);
 transferRecordBackButton.addEventListener("click", closeTransferRecordView);

@@ -171,6 +171,7 @@
           </div>
 
           <input class="book-file-input" id="bookFileInput" type="file" accept=".epub,.txt,application/epub+zip,text/plain" multiple hidden />
+          <input class="book-file-input" id="wallpaperFileInput" type="file" accept="image/*" multiple hidden />
         </section>
 
         <section class="bookstore-view" id="bookstoreView" aria-label="书城">
@@ -1134,14 +1135,14 @@
           </button>
         </section>
 
-        <section class="import-transfer-sheet" id="importTransferSheet" aria-label="选择导入图书方式" hidden>
+        <section class="import-transfer-sheet" id="importTransferSheet" aria-label="选择导入方式" hidden>
           <button class="import-transfer-close" type="button" id="importTransferCloseButton" aria-label="关闭导入方式面板">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="m6 6 12 12" />
               <path d="m18 6-12 12" />
             </svg>
           </button>
-          <h2>导入图书</h2>
+          <h2 id="importTransferTitle">导入图书</h2>
           <div class="import-transfer-options">
             <button type="button" id="importConnectDeviceButton">
               <span class="import-transfer-icon import-transfer-icon-wifi">
